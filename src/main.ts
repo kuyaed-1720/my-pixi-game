@@ -21,6 +21,16 @@ async function setup() {
     bunny.x = app.screen.width / 2;
     bunny.y = app.screen.height / 2;
 
+    bunny.eventMode = 'static';
+    bunny.cursor = 'pointer';
+
+    bunny.on('pointerdown', (event: PIXI.FederatedPointerEvent) => {
+        console.log('Bunny clicked at:', event.global.x, event.global.y);
+
+        bunny.scale.set(1.5);
+        setTimeout(() => bunny.scale.set(1), 100);
+    });
+
     app.stage.addChild(bunny);
 
     app.ticker.add((time) => {
