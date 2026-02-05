@@ -1,24 +1,31 @@
-import './style.css'
-import typescriptLogo from './typescript.svg'
-import viteLogo from '/vite.svg'
-import { setupCounter } from './counter.ts'
+import * as PIXI from 'pixi.js';
 
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="${viteLogo}" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://www.typescriptlang.org/" target="_blank">
-      <img src="${typescriptLogo}" class="logo vanilla" alt="TypeScript logo" />
-    </a>
-    <h1>Vite + TypeScript</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite and TypeScript logos to learn more
-    </p>
-  </div>
-`
+async function setup() {
+    const app =  new PIXI.Application();
 
-setupCounter(document.querySelector<HTMLButtonElement>('#counter')!)
+    await app.init({
+        width: 800,
+        height: 600,
+        backgroundColor: 0x1099bb,
+        antialias: true
+    });
+
+    document.body.appendChild(app.canvas);
+
+    const texture = await PIXI.Assets.load('https://pixijs.com/assets/bunny.png');
+
+    const bunny = new PIXI.Sprite(texture);
+
+    bunny.anchor.set(0.5);
+
+    bunny.x = app.screen.width / 2;
+    bunny.y = app.screen.height / 2;
+
+    app.stage.addChild(bunny);
+
+    app.ticker.add((time) => {
+        bunny.rotation += time.deltaTime;
+    });
+}
+
+setup();
