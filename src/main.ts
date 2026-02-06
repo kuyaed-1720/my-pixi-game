@@ -1,41 +1,23 @@
 import * as PIXI from 'pixi.js';
+import { Player } from './Player';
 
-async function setup() {
+async function init() {
     const app =  new PIXI.Application();
 
     await app.init({
         width: 800,
         height: 600,
-        backgroundColor: 0x1099bb,
-        antialias: true
     });
 
     document.body.appendChild(app.canvas);
 
-    const texture = await PIXI.Assets.load('https://pixijs.com/assets/bunny.png');
-
-    const bunny = new PIXI.Sprite(texture);
-
-    bunny.anchor.set(0.5);
-
-    bunny.x = app.screen.width / 2;
-    bunny.y = app.screen.height / 2;
-
-    bunny.eventMode = 'static';
-    bunny.cursor = 'pointer';
-
-    bunny.on('pointerdown', (event: PIXI.FederatedPointerEvent) => {
-        console.log('Bunny clicked at:', event.global.x, event.global.y);
-
-        bunny.scale.set(1.5);
-        setTimeout(() => bunny.scale.set(1), 100);
-    });
-
-    app.stage.addChild(bunny);
+    const texture = await PIXI.Assets.load('/public/elf.png');
+    const hero = new Player(texture, 400, 300);
+    app.stage.addChild(hero.sprite);
 
     app.ticker.add((time) => {
-        bunny.rotation += time.deltaTime;
-    });
+        hero.update(time.deltaTime);
+    })
 }
 
-setup();
+init();
