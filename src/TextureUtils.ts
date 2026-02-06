@@ -7,6 +7,7 @@ export function getFrame(
     width: number,
     height: number,
 ): PIXI.Texture {
+    PIXI.TextureSource.defaultOptions.scaleMode = 'nearest';
     const frame = new PIXI.Rectangle(col * width, row * height, width, height);
     return new PIXI.Texture({
         source: baseTexture.source,
