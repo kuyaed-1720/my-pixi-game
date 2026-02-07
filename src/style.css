@@ -1,4 +1,44 @@
+body,
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  background-color: #2c3e50;
+  color: white;
+  font-family: sans-serif;
+}
+
+#game-container {
+  display: flex;
+  height: 50vh;
+  width: 100vw;
+}
+
+#pixi-content {
+  flex: 1;
+  background: black;
+  justify-content: center;
+  align-items: center;
+}
+
+#description-side {
+  flex: 1;
+  padding: 20px;
+  background: #34495e;
+  border-left: 2px solid #2c3e50;
+}
+
+#description-bottom {
+  height: 50vh;
+  padding: 20px;
+  background: #2c3e50;
+  border-top: 2px solid #1a252f;
+}
+
 canvas {
+  max-width: 100%;
+  max-height: 100%;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
   -ms-interpolation-mode: nearest-neighbor;
