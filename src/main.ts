@@ -32,12 +32,22 @@ async function init() {
     const hero = new Player(heroTexture, 400, 400);
 
     // Add to canvas
-    app.stage.addChild(map.floor);
-    app.stage.addChild(hero.sprite);
+    const world = new PIXI.Container();
+    app.stage.addChild(world);
+    world.addChild(map.floor);
+    world.addChild(hero.sprite);
 
     app.ticker.add((time) => {
         hero.update(time.deltaTime);
-    })
+
+        const centerX = app.screen.width / 2;
+        const centery = app.screen.height / 2;
+
+        world.x = centerX - hero.sprite.x;
+        world.y = centery - hero.sprite.y;
+
+        world.x += (centerX - hero.sprite.x - world.x) * 0.1;
+    });
 }
 
 init();
