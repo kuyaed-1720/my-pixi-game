@@ -19,26 +19,41 @@ export class Player {
   }
 
   public update(deltaTime: number) {
+    let moveX = 0;
+    let moveY = 0;
     let isMoving = false;
-    const moveAmount = this.speed * deltaTime;
 
+    // Capture direction
     if (this.keys["KeyW"]) {
-      this.sprite.y -= moveAmount;
+      moveY -= 1;
       isMoving = true;
     }
     if (this.keys["KeyS"]) {
-      this.sprite.y += moveAmount;
+      moveY += 1;
       isMoving = true;
     }
     if (this.keys["KeyA"]) {
-      this.sprite.x -= moveAmount;
-      this.sprite.scale.x = -4;
+      moveX -= 1;
       isMoving = true;
     }
     if (this.keys["KeyD"]) {
-      this.sprite.x += moveAmount;
-      this.sprite.scale.x = 4;
+      moveX += 1;
       isMoving = true;
+    }
+
+    // Normalise speed
+    if (isMoving) {
+      const length = Math.sqrt(moveX * moveX + moveY * moveY);
+      const velocityX = (moveX / length) * this.speed;
+      const velocityY = (moveY / length) * this.speed;
+
+      this.sprite.x += velocityX * deltaTime;
+      this.sprite.y += velocityY * deltaTime;
+
+      // Handle sprite flipping
+      if (moveX !== 0) {
+        this.sprite.scale.x = moveX > 0 ? 4 : -4;
+      }
     }
 
     if (isMoving && this.sprite.textures !== this.animations.walk) {
