@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js';
 import { Player } from './Player';
-import { getFrame } from './TextureUtils';
+import { getFrame, getAnimationFrames } from './TextureUtils';
 import { DungeonMap } from './Map';
 
 async function init() {
@@ -27,9 +27,10 @@ async function init() {
     const floorTexture = getFrame(floorSheet, 0, 0, 16, 16);
     const map = new DungeonMap(floorTexture, app.screen.width, app.screen.height);
 
-    const entitySheet = await PIXI.Assets.load('elf.png');
-    const heroTexture = getFrame(entitySheet, 0, 0, 16, 16);
-    const hero = new Player(heroTexture, 400, 400);
+    const elfSheet = await PIXI.Assets.load('elf.png');
+    const idleFrames = getAnimationFrames(elfSheet, 0, 3, 16, 16);
+    const walkFrames = getAnimationFrames(elfSheet, 2, 3, 16, 16);
+    const hero = new Player(idleFrames, walkFrames);
 
     // Add to canvas
     const world = new PIXI.Container();
