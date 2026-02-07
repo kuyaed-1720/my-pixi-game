@@ -1,11 +1,16 @@
+:root {
+  --gb-green: #2d5d3d;
+  --gb-white: #f4f4f4;
+}
+
 body,
 html {
   margin: 0;
   padding: 0;
   height: 100%;
   overflow: hidden;
-  background-color: #2c3e50;
-  color: white;
+  background-color: var(--gb-white);
+  color: var(--gb-green);
   font-family: sans-serif;
 }
 
@@ -13,11 +18,12 @@ html {
   display: flex;
   height: 50vh;
   width: 100vw;
+  border-bottom: 4px solid var(--gb-green);
 }
 
 #pixi-content {
   flex: 1;
-  background: black;
+  background: #9bbc0f;
   justify-content: center;
   align-items: center;
 }
@@ -25,15 +31,19 @@ html {
 #description-side {
   flex: 1;
   padding: 20px;
-  background: #34495e;
-  border-left: 2px solid #2c3e50;
+  background: var(--gb-white);
+  border-left: 2px solid var(--gb-green);
 }
 
 #description-bottom {
   height: 50vh;
   padding: 20px;
-  background: #2c3e50;
-  border-top: 2px solid #1a252f;
+  background: var(--gb-white);
+}
+
+a:hover {
+  background: var(--gb-green);
+  color: var(--gb-white);
 }
 
 canvas {

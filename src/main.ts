@@ -23,11 +23,11 @@ async function init() {
     container.appendChild(app.canvas);
 
     // Ready the textures
-    const floorSheet = await PIXI.Assets.load('/public/grounds.png');
+    const floorSheet = await PIXI.Assets.load('grounds.png');
     const floorTexture = getFrame(floorSheet, 0, 0, 16, 16);
     const map = new DungeonMap(floorTexture, app.screen.width, app.screen.height);
 
-    const entitySheet = await PIXI.Assets.load('/public/elf.png');
+    const entitySheet = await PIXI.Assets.load('elf.png');
     const heroTexture = getFrame(entitySheet, 0, 0, 16, 16);
     const hero = new Player(heroTexture, 400, 400);
 
