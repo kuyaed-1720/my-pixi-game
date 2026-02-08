@@ -1,7 +1,7 @@
 name: Build and Deploy Game
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   deploy:
@@ -16,6 +16,4 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: dist
-          repository-name: kuyaed-1720/kuyaed-1720.github.io
-          branch: main
-          token: ${{ secrets.PORTFOLIO_TOKEN }}
+          branch: gh-pages
