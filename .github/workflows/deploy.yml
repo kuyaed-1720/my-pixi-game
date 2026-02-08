@@ -12,8 +12,8 @@ jobs:
         run: |
           npm install
           npm run build
-      - name: Deploy to Portfolio
+      - name: Deploy to Github Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
+          branch: gh-pages
           folder: dist
-          branch: main
