@@ -5,6 +5,7 @@ import { DungeonMap } from "./Map";
 import { Collectible } from "./Collectible";
 
 const items: Collectible[] = [];
+const inventory: { [key: string]: number } = {};
 let potionCount = 0;
 
 async function init() {
@@ -64,7 +65,10 @@ async function init() {
                 const distance = Math.sqrt(dx * dx + dy * dy);
 
                 if (distance < 20) {
-                    potionCount += item.collect();
+                    item.collect();
+
+                    const itemType = item.id;
+                    inventory[itemType] = (inventory[itemType] || 0) + 1;
                 }
             }
         });
@@ -78,9 +82,14 @@ async function init() {
         }
 
         if (debugHud && hero.sprite) {
+            let inventoryText = "";
+            for (const [name, count] of Object.entries(inventory)) {
+                inventoryText += `<br>${name}: ${count}`;
+            }
             debugHud.innerHTML = `
                 X: ${hero.sprite.x.toFixed(2)} | Y: ${hero.sprite.y.toFixed(2)}<br>
-                Potions: ${potionCount}
+                Potions: ${potionCount}<br>
+                Inventory: ${inventoryText || "Empty"}
             `;
         }
     });
