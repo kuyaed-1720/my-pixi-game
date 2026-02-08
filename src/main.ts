@@ -3,10 +3,10 @@ import { Player } from "./Player";
 import { getAnimationFrames } from "./TextureUtils";
 import { DungeonMap } from "./Map";
 import { Collectible } from "./Collectible";
+import { Inventory } from "./Inventory";
 
 const items: Collectible[] = [];
-const inventory: { [key: string]: number } = {};
-let potionCount = 0;
+const inventory: Inventory = new Inventory(3);
 
 async function init() {
     // Get the game container
@@ -36,8 +36,14 @@ async function init() {
     const dungeon = new DungeonMap(groundSheet, 1, 4, 12, 9);
 
     const itemSheet = await PIXI.Assets.load("pickup_items_animated.png");
+    const coinTexture = getAnimationFrames(itemSheet, 0, 3, 16, 16);
+    const keyTexture = getAnimationFrames(itemSheet, 1, 3, 16, 16);
     const potionTexture = getAnimationFrames(itemSheet, 2, 3, 16, 16);
-    const potion = new Collectible(potionTexture, 300, 300, "Health Potion");
+    const bombTexture = getAnimationFrames(itemSheet, 3, 3, 16, 16);
+    const coin = new Collectible(coinTexture, 100, 100, "Coin");
+    const bomb = new Collectible(bombTexture, 200, 100, "Bomb");
+    const potion = new Collectible(potionTexture, 300, 100, "Potion");
+    const key = new Collectible(keyTexture, 400, 100, "Key");
 
     const elfSheet = await PIXI.Assets.load("elf.png");
     const idleFrames = getAnimationFrames(elfSheet, 0, 3, 16, 16);
@@ -49,9 +55,15 @@ async function init() {
     app.stage.addChild(world);
     world.addChild(dungeon.container);
     world.addChild(potion.sprite);
+    world.addChild(coin.sprite);
+    world.addChild(bomb.sprite);
+    world.addChild(key.sprite);
     world.addChild(hero.sprite);
 
     items.push(potion);
+    items.push(key);
+    items.push(coin);
+    items.push(bomb);
 
     app.ticker.add((time) => {
         if (app.screen.width === 0 || !hero.sprite) return;
@@ -65,10 +77,10 @@ async function init() {
                 const distance = Math.sqrt(dx * dx + dy * dy);
 
                 if (distance < 20) {
-                    item.collect();
-
                     const itemType = item.id;
-                    inventory[itemType] = (inventory[itemType] || 0) + 1;
+                    if (inventory.addItem(itemType)) {
+                        item.collect();
+                    }
                 }
             }
         });
@@ -82,14 +94,11 @@ async function init() {
         }
 
         if (debugHud && hero.sprite) {
-            let inventoryText = "";
-            for (const [name, count] of Object.entries(inventory)) {
-                inventoryText += `<br>${name}: ${count}`;
-            }
+            let inventoryText = inventory.getSummary();
+
             debugHud.innerHTML = `
                 X: ${hero.sprite.x.toFixed(2)} | Y: ${hero.sprite.y.toFixed(2)}<br>
-                Potions: ${potionCount}<br>
-                Inventory: ${inventoryText || "Empty"}
+                Inventory: ${inventoryText}
             `;
         }
     });
