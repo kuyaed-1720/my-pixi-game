@@ -18,9 +18,10 @@ export class Collectible {
         this.id = id;
     }
 
-    public collect() {
+    public collect(): number {
         this.isCollected = true;
         this.sprite.visible = false;
         console.log(`${this.id} was picked up!`);
+        return 1;
     }
 }

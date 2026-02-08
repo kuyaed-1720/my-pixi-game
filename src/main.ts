@@ -1,10 +1,11 @@
 import * as PIXI from "pixi.js";
 import { Player } from "./Player";
-import { getFrame, getAnimationFrames } from "./TextureUtils";
+import { getAnimationFrames } from "./TextureUtils";
 import { DungeonMap } from "./Map";
 import { Collectible } from "./Collectible";
 
 const items: Collectible[] = [];
+let potionCount = 0;
 
 async function init() {
     // Get the game container
@@ -63,7 +64,7 @@ async function init() {
                 const distance = Math.sqrt(dx * dx + dy * dy);
 
                 if (distance < 20) {
-                    item.collect();
+                    potionCount += item.collect();
                 }
             }
         });
@@ -77,7 +78,10 @@ async function init() {
         }
 
         if (debugHud && hero.sprite) {
-            debugHud.innerText = `X: ${hero.sprite.x.toFixed(2)} | Y: ${hero.sprite.y.toFixed(2)}`;
+            debugHud.innerHTML = `
+                X: ${hero.sprite.x.toFixed(2)} | Y: ${hero.sprite.y.toFixed(2)}<br>
+                Potions: ${potionCount}
+            `;
         }
     });
 }
