@@ -8,10 +8,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      
       - name: Install and Build
         run: |
           npm install
           npm run build
+          
       - name: Deploy to Portfolio
         uses: JamesIves/github-pages-deploy-action@v4
         with:
@@ -19,3 +21,4 @@ jobs:
           repository-name: kuyaed-1720/kuyaed-1720.github.io
           branch: main
           token: ${{ secrets.PORTFOLIO_TOKEN }}
+          targert-folder: my-pixi-game
