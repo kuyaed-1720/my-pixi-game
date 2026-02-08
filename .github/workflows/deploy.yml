@@ -25,3 +25,4 @@ jobs:
           branch: main
           token: ${{ secrets.PORTFOLIO_TOKEN }}
           target-folder: my-pixi-game
+          clean: false
