@@ -9,7 +9,6 @@ export class Player extends Entity {
 
     constructor(animations: Record<string, PIXI.AnimatedSprite>, health: number, id: string) {
         super(animations['idle'], health, id);
-        this.container.scale.set(4);
         this.animations = animations;
         this.playAnimation('idle');
 
@@ -66,13 +65,19 @@ export class Player extends Entity {
     public playAnimation(key: string) {
         if (this.currentState === key) return;
 
+        const oldX = this.sprite.x;
+        const oldY = this.sprite.y;
+
         this.container.removeChild(this.sprite);
         this.sprite.stop();
 
         this.currentState = key;
         this.sprite = this.animations[key];
 
+        this.sprite.scale.set(4);
         this.sprite.anchor.set(0.5);
+        this.sprite.x = oldX;
+        this.sprite.y = oldY;
         this.sprite.animationSpeed = 0.1;
 
         this.container.addChild(this.sprite);
