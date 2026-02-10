@@ -19,6 +19,10 @@ export class Player extends Entity {
     }
 
     public update(deltaTime: number) {
+        if (this.isDestroyed) {
+            return;
+        }
+
         let moveX = 0;
         let moveY = 0;
         let isMoving = false;

@@ -94,12 +94,14 @@ async function init() {
 
         hero.update(time.deltaTime);
 
-        const dx = hero.sprite.x - enemy.sprite.x;
-        const dy = hero.sprite.y - enemy.sprite.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
+        if (enemy) {
+            const dx = hero.sprite.x - enemy.sprite.x;
+            const dy = hero.sprite.y - enemy.sprite.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
 
-        if (distance < 50) {
-            enemy.takeDamage(200);
+            if (distance < 50) {
+                enemy.takeDamage(200);
+            }
         }
 
         items.forEach(item => {
