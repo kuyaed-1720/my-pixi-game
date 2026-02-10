@@ -96,7 +96,7 @@ async function init() {
 
         hero.update(time.deltaTime);
 
-        if (enemy) {
+        if (enemy && !enemy.isDestroyed) {
             const dx = hero.sprite.x - enemy.sprite.x;
             const dy = hero.sprite.y - enemy.sprite.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
