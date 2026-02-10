@@ -1,18 +1,21 @@
 import * as PIXI from "pixi.js";
+import { Entity } from "./Entity";
 
-export class Player {
-    public sprite: PIXI.AnimatedSprite;
-    private animations: { idle: PIXI.Texture[]; walk: PIXI.Texture[] };
+export class Player extends Entity {
+    private animations: Record<string, PIXI.AnimatedSprite>;
+    private currentState: string = 'idle';
     private speed: number = 3;
     private keys: Record<string, boolean> = {};
 
-    constructor(idleFrames: PIXI.Texture[], walkFrames: PIXI.Texture[]) {
-        this.animations = { idle: idleFrames, walk: walkFrames };
-        this.sprite = new PIXI.AnimatedSprite(this.animations.idle);
-        this.sprite.scale.set(4);
-        this.sprite.anchor.set(0.5);
-        this.sprite.animationSpeed = 0.1;
-        this.sprite.play();
+    constructor(animations: Record<string, PIXI.AnimatedSprite>, health: number, id: string) {
+        // constructor(idleFrames: PIXI.Texture[], walkFrames: PIXI.Texture[]) {
+        //     this.sprite = new PIXI.AnimatedSprite(this.animations.idle);
+        //     this.sprite.scale.set(4);
+        //     this.sprite.anchor.set(0.5);
+        //     this.sprite.animationSpeed = 0.1;
+        //     this.sprite.play();
+        super(animations['idle'], health, id);
+        this.animations = animations;
 
         window.addEventListener("keydown", (e) => (this.keys[e.code] = true));
         window.addEventListener("keyup", (e) => (this.keys[e.code] = false));
@@ -54,17 +57,22 @@ export class Player {
             }
 
             // Handle sprite flipping
-            if (moveX !== 0) {
-                this.sprite.scale.x = moveX > 0 ? 4 : -4;
-            }
+            if (moveX !== 0) this.sprite.scale.x = moveX > 0 ? 4 : -4;
         }
 
-        if (isMoving && this.sprite.textures !== this.animations.walk) {
-            this.sprite.textures = this.animations.walk;
-            this.sprite.play();
-        } else if (!isMoving && this.sprite.textures !== this.animations.idle) {
-            this.sprite.textures = this.animations.idle;
-            this.sprite.play();
-        }
+        if (isMoving) this.currentState = 'walk';
+        else this.currentState = 'idle';
+
+        this.playAnimation(this.currentState);
+    }
+
+    public playAnimation(key: string) {
+        if (this.currentState === key) return;
+
+        this.sprite.visible = false;
+        this.currentState = key;
+        this.sprite = this.animations[key];
+        this.sprite.visible = true;
+        this.sprite.play();
     }
 }
