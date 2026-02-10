@@ -22,6 +22,8 @@ export class Entity {
 
     public onDeath() {
         this.isDestroyed = true;
-        this.sprite.destroy();
+        setTimeout(() => {
+            this.sprite.destroy();
+        }, 100);
     }
 }

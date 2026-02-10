@@ -78,7 +78,7 @@ async function init() {
     world.addChild(hero.container);
     world.addChild(enemy.container);
 
-    if (enemy) {
+    if (enemy && !enemy.isDestroyed) {
         enemy.sprite.x = 300;
         enemy.sprite.y = 400;
     }
