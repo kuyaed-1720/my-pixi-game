@@ -9,10 +9,7 @@ export class Player extends Entity {
 
     constructor(animations: Record<string, PIXI.AnimatedSprite>, health: number, id: string) {
         super(animations['idle'], health, id);
-        this.sprite.scale.set(4);
-        this.sprite.anchor.set(0.5);
         this.animations = animations;
-        this.sprite.animationSpeed = 0.1;
         this.playAnimation('idle');
 
         window.addEventListener("keydown", (e) => (this.keys[e.code] = true));
@@ -73,6 +70,10 @@ export class Player extends Entity {
 
         this.currentState = key;
         this.sprite = this.animations[key];
+
+        this.sprite.scale.set(4);
+        this.sprite.anchor.set(0.5);
+        this.sprite.animationSpeed = 0.1;
 
         this.container.addChild(this.sprite);
         this.sprite.play();
