@@ -75,6 +75,7 @@ async function init() {
     enemy.sprite.y = 500;
     enemy.sprite.scale.set(4);
     enemy.sprite.anchor.set(0.5);
+    enemy.sprite.animationSpeed = 0.1;
     enemy.sprite.play();
 
     // Add to canvas
@@ -102,15 +103,15 @@ async function init() {
 
         hero.update(time.deltaTime);
 
-        // if (enemy && !enemy.isDestroyed) {
-        //     const dx = hero.sprite.x - enemy.sprite.x;
-        //     const dy = hero.sprite.y - enemy.sprite.y;
-        //     const distance = Math.sqrt(dx * dx + dy * dy);
+        if (enemy && !enemy.isDestroyed) {
+            const dx = hero.sprite.x - enemy.sprite.x;
+            const dy = hero.sprite.y - enemy.sprite.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
 
-        //     if (distance < 50) {
-        //         enemy.takeDamage(50);
-        //     }
-        // }
+            if (distance < 50 && hero.isAttacking) {
+                enemy.takeDamage(50);
+            }
+        }
 
         items.forEach(item => {
             if (!item.isCollected) {

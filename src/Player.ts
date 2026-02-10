@@ -5,6 +5,7 @@ export class Player extends Entity {
     private animations: Record<string, PIXI.AnimatedSprite>;
     private currentState: string = 'idle';
     private speed: number = 3;
+    public isAttacking: boolean = false;
     private keys: Record<string, boolean> = {};
 
     constructor(animations: Record<string, PIXI.AnimatedSprite>, health: number, id: string) {
@@ -45,6 +46,7 @@ export class Player extends Entity {
             isMoving = true;
         }
         if (this.keys["Space"]) {
+            this.isAttacking = true;
             this.attack();
         }
 
@@ -93,6 +95,7 @@ export class Player extends Entity {
     private attack() {
         this.playAnimation('attack');
         this.sprite.onComplete = () => {
+            this.isAttacking = false;
             this.playAnimation('idle');
         }
     }
