@@ -38,6 +38,7 @@ async function init() {
     const groundSheet = await PIXI.Assets.load("grounds.png");
     const itemSheet = await PIXI.Assets.load("pickup_items_animated.png");
     const elfSheet = await PIXI.Assets.load("elf.png");
+    const enemySheet = await PIXI.Assets.load("elf.png");
 
     // Ready the animation frames
     const coinTexture = getAnimationFrames(itemSheet, 0, 3, 16, 16);
@@ -47,6 +48,7 @@ async function init() {
     const idleFrames = getAnimationFrames(elfSheet, 0, 3, 16, 16);
     const walkFrames = getAnimationFrames(elfSheet, 2, 4, 16, 16);
     const attackFrames = getAnimationFrames(elfSheet, 4, 5, 16, 16);
+    const enemyIdleFrames = getAnimationFrames(enemySheet, 0, 3, 16, 16);
 
     // Create the map
     const dungeon = new DungeonMap(groundSheet, 1, 4, 12, 9);
@@ -64,10 +66,13 @@ async function init() {
         walk: new PIXI.AnimatedSprite(walkFrames),
         attack: new PIXI.AnimatedSprite(attackFrames)
     };
+    const enemyAnimations = {
+        idle: new PIXI.AnimatedSprite(enemyIdleFrames),
+    };
     const hero = new Player(animations, 200, 'hero');
-    const enemy = new Entity(animations['idle'], 200, 'enemy');
-    enemy.sprite.x = 300;
-    enemy.sprite.y = 300;
+    const enemy = new Entity(enemyAnimations['idle'], 200, 'enemy');
+    enemy.sprite.x = 500;
+    enemy.sprite.y = 500;
     enemy.sprite.scale.set(4);
     enemy.sprite.anchor.set(0.5);
     enemy.sprite.play();
