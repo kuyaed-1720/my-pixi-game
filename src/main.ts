@@ -44,6 +44,7 @@ async function init() {
     const bomb = new Collectible(bombTexture, 200, 100, "Bomb");
     const potion = new Collectible(potionTexture, 300, 100, "Potion");
     const key = new Collectible(keyTexture, 400, 100, "Key");
+    const key2 = new Collectible(keyTexture, 200, 300, "Key");
 
     const elfSheet = await PIXI.Assets.load("elf.png");
     const idleFrames = getAnimationFrames(elfSheet, 0, 3, 16, 16);
@@ -59,10 +60,12 @@ async function init() {
     world.addChild(coin.sprite);
     world.addChild(bomb.sprite);
     world.addChild(key.sprite);
+    world.addChild(key2.sprite);
     world.addChild(hero.sprite);
 
     items.push(potion);
     items.push(key);
+    items.push(key2);
     items.push(coin);
     items.push(bomb);
 
