@@ -78,8 +78,10 @@ async function init() {
     world.addChild(hero.container);
     world.addChild(enemy.container);
 
-    enemy.sprite.x = 300;
-    enemy.sprite.y = 400;
+    if (enemy) {
+        enemy.sprite.x = 300;
+        enemy.sprite.y = 400;
+    }
 
     // Add items to list of collectibles
     items.push(potion);
