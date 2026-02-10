@@ -70,10 +70,13 @@ export class Player extends Entity {
     public playAnimation(key: string) {
         if (this.currentState === key) return;
 
-        this.sprite.visible = false;
+        this.container.removeChild(this.sprite);
+        this.sprite.stop();
+
         this.currentState = key;
         this.sprite = this.animations[key];
-        this.sprite.visible = true;
+
+        this.container.addChild(this.sprite);
         this.sprite.play();
     }
 

@@ -62,7 +62,7 @@ async function init() {
     world.addChild(bomb.sprite);
     world.addChild(key.sprite);
     world.addChild(key2.sprite);
-    world.addChild(hero.sprite);
+    world.addChild(hero.container);
 
     items.push(potion);
     items.push(key);
