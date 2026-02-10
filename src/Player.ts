@@ -93,10 +93,12 @@ export class Player extends Entity {
     }
 
     private attack() {
+        if (this.isAttacking) return;
+        this.isAttacking = true;
         this.playAnimation('attack');
         this.sprite.onComplete = () => {
             this.isAttacking = false;
             this.playAnimation('idle');
-        }
+        };
     }
 }
