@@ -10,6 +10,8 @@ export class Player extends Entity {
     constructor(animations: Record<string, PIXI.AnimatedSprite>, health: number, id: string) {
         super(animations['idle'], health, id);
         this.animations = animations;
+        this.sprite.scale.set(4);
+        this.sprite.anchor.set(0.5);
         this.playAnimation('idle');
 
         window.addEventListener("keydown", (e) => (this.keys[e.code] = true));
