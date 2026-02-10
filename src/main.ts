@@ -97,15 +97,15 @@ async function init() {
 
         hero.update(time.deltaTime);
 
-        if (enemy && !enemy.isDestroyed) {
-            const dx = hero.sprite.x - enemy.sprite.x;
-            const dy = hero.sprite.y - enemy.sprite.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
+        // if (enemy && !enemy.isDestroyed) {
+        //     const dx = hero.sprite.x - enemy.sprite.x;
+        //     const dy = hero.sprite.y - enemy.sprite.y;
+        //     const distance = Math.sqrt(dx * dx + dy * dy);
 
-            if (distance < 50) {
-                enemy.takeDamage(50);
-            }
-        }
+        //     if (distance < 50) {
+        //         enemy.takeDamage(50);
+        //     }
+        // }
 
         items.forEach(item => {
             if (!item.isCollected) {
@@ -134,14 +134,14 @@ async function init() {
         if (debugHud && hero.sprite) {
             let inventoryText = inventory.getSummary();
 
-            let enemyText = 0;
+            let enemyText = '';
 
-            if (enemy && !enemy.isDestroyed) { enemyText = enemy.health; }
+            if (enemy && !enemy.isDestroyed) { enemyText = `X: ${enemy.sprite.x} Y: ${enemy.sprite.y} | ${enemy.health}`; }
 
             debugHud.innerHTML = `
                 X: ${hero.sprite.x.toFixed(2)} | Y: ${hero.sprite.y.toFixed(2)}<br>
                 Inventory: ${inventoryText}<br>
-                Enemy Health: ${enemyText};
+                Enemy: ${enemyText};
             `;
         }
     });
