@@ -66,8 +66,13 @@ export class Player extends Entity {
             if (moveX !== 0) this.sprite.scale.x = moveX > 0 ? 4 : -4;
         }
 
-        if (isMoving) { this.playAnimation('walk'); }
-        else { this.playAnimation('idle'); };
+        if (this.isAttacking) {
+            this.playAnimation('attack');
+        } else if (isMoving) {
+            this.playAnimation('walk');
+        } else {
+            this.playAnimation('idle');
+        };
     }
 
     public playAnimation(key: string) {
