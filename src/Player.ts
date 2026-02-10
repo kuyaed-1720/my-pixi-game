@@ -8,14 +8,11 @@ export class Player extends Entity {
     private keys: Record<string, boolean> = {};
 
     constructor(animations: Record<string, PIXI.AnimatedSprite>, health: number, id: string) {
-        // constructor(idleFrames: PIXI.Texture[], walkFrames: PIXI.Texture[]) {
-        //     this.sprite = new PIXI.AnimatedSprite(this.animations.idle);
-        //     this.sprite.scale.set(4);
-        //     this.sprite.anchor.set(0.5);
-        //     this.sprite.animationSpeed = 0.1;
-        //     this.sprite.play();
         super(animations['idle'], health, id);
+        this.sprite.scale.set(4);
+        this.sprite.anchor.set(0.5);
         this.animations = animations;
+        this.sprite.animationSpeed = 0.1;
 
         window.addEventListener("keydown", (e) => (this.keys[e.code] = true));
         window.addEventListener("keyup", (e) => (this.keys[e.code] = false));
