@@ -64,6 +64,7 @@ async function init() {
         attack: new PIXI.AnimatedSprite(attackFrames)
     };
     const hero = new Player(animations, 200, 'hero');
+    const enemy = new Player(animations, 200, 'enemy');
 
     // Add to canvas
     const world = new PIXI.Container();
@@ -75,6 +76,10 @@ async function init() {
     world.addChild(key.sprite);
     world.addChild(key2.sprite);
     world.addChild(hero.container);
+    world.addChild(enemy.container);
+
+    enemy.container.x = 300;
+    enemy.container.y = 400;
 
     // Add items to list of collectibles
     items.push(potion);
@@ -88,6 +93,14 @@ async function init() {
         if (app.screen.width === 0 || !hero.sprite) return;
 
         hero.update(time.deltaTime);
+
+        const dx = hero.sprite.x - enemy.sprite.x;
+        const dy = hero.sprite.y - enemy.sprite.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < 50) {
+            enemy.takeDamage(200);
+        }
 
         items.forEach(item => {
             if (!item.isCollected) {
