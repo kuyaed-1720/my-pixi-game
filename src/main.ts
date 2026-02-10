@@ -4,6 +4,7 @@ import { getAnimationFrames } from "./TextureUtils";
 import { DungeonMap } from "./Map";
 import { Collectible } from "./Collectible";
 import { Inventory } from "./Inventory";
+import { Entity } from "./Entity";
 
 const items: Collectible[] = [];
 const inventory: Inventory = new Inventory(3);
@@ -64,7 +65,12 @@ async function init() {
         attack: new PIXI.AnimatedSprite(attackFrames)
     };
     const hero = new Player(animations, 200, 'hero');
-    const enemy = new Player(animations, 200, 'enemy');
+    const enemy = new Entity(animations['idle'], 200, 'enemy');
+    enemy.sprite.x = 300;
+    enemy.sprite.y = 300;
+    enemy.sprite.scale.set(4);
+    enemy.sprite.anchor.set(0.5);
+    enemy.sprite.play();
 
     // Add to canvas
     const world = new PIXI.Container();
@@ -77,11 +83,6 @@ async function init() {
     world.addChild(key2.sprite);
     world.addChild(hero.container);
     world.addChild(enemy.container);
-
-    if (enemy && !enemy.isDestroyed) {
-        enemy.sprite.x = 300;
-        enemy.sprite.y = 400;
-    }
 
     // Add items to list of collectibles
     items.push(potion);
@@ -102,7 +103,7 @@ async function init() {
             const distance = Math.sqrt(dx * dx + dy * dy);
 
             if (distance < 50) {
-                enemy.takeDamage(200);
+                enemy.takeDamage(50);
             }
         }
 
@@ -133,9 +134,14 @@ async function init() {
         if (debugHud && hero.sprite) {
             let inventoryText = inventory.getSummary();
 
+            let enemyText = 0;
+
+            if (enemy && !enemy.isDestroyed) { enemyText = enemy.health; }
+
             debugHud.innerHTML = `
                 X: ${hero.sprite.x.toFixed(2)} | Y: ${hero.sprite.y.toFixed(2)}<br>
-                Inventory: ${inventoryText}
+                Inventory: ${inventoryText}<br>
+                Enemy Health: ${enemyText};
             `;
         }
     });
