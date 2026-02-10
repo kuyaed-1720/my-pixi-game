@@ -61,10 +61,8 @@ export class Player extends Entity {
             if (moveX !== 0) this.sprite.scale.x = moveX > 0 ? 4 : -4;
         }
 
-        if (isMoving) this.currentState = 'walk';
-        else this.currentState = 'idle';
-
-        this.playAnimation(this.currentState);
+        if (isMoving) { this.playAnimation('walk'); }
+        else { this.playAnimation('idle'); };
     }
 
     public playAnimation(key: string) {
