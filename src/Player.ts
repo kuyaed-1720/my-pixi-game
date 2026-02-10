@@ -13,6 +13,7 @@ export class Player extends Entity {
         this.sprite.anchor.set(0.5);
         this.animations = animations;
         this.sprite.animationSpeed = 0.1;
+        this.playAnimation('idle');
 
         window.addEventListener("keydown", (e) => (this.keys[e.code] = true));
         window.addEventListener("keyup", (e) => (this.keys[e.code] = false));
@@ -39,6 +40,9 @@ export class Player extends Entity {
         if (this.keys["KeyD"]) {
             moveX += 1;
             isMoving = true;
+        }
+        if (this.keys["Space"]) {
+            this.attack();
         }
 
         // Normalise speed
@@ -71,5 +75,12 @@ export class Player extends Entity {
         this.sprite = this.animations[key];
         this.sprite.visible = true;
         this.sprite.play();
+    }
+
+    private attack() {
+        this.playAnimation('attack');
+        this.sprite.onComplete = () => {
+            this.playAnimation('idle');
+        }
     }
 }

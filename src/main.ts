@@ -48,8 +48,9 @@ async function init() {
 
     const elfSheet = await PIXI.Assets.load("elf.png");
     const idleFrames = getAnimationFrames(elfSheet, 0, 3, 16, 16);
-    const walkFrames = getAnimationFrames(elfSheet, 2, 3, 16, 16);
-    const animations = { idle: new PIXI.AnimatedSprite(idleFrames), walk: new PIXI.AnimatedSprite(walkFrames) };
+    const walkFrames = getAnimationFrames(elfSheet, 2, 4, 16, 16);
+    const attackFrames = getAnimationFrames(elfSheet, 4, 5, 16, 16);
+    const animations = { idle: new PIXI.AnimatedSprite(idleFrames), walk: new PIXI.AnimatedSprite(walkFrames), attack: new PIXI.AnimatedSprite(attackFrames) };
     const hero = new Player(animations, 200, 'hero');
 
     // Add to canvas
