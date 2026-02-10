@@ -1,7 +1,9 @@
 name: Build and Deploy Game
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+      - combat-system
 
 jobs:
   deploy:
@@ -17,3 +19,4 @@ jobs:
         with:
           branch: gh-pages
           folder: dist
+          target-folder: dev

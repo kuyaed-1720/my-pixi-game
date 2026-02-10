@@ -3,7 +3,7 @@ import { defineConfig } from 'vite'
 export default defineConfig({
     base: '/my-pixi-game/',
     build: {
-        outDir: 'dist',
+        outDir: 'dist/dev',
         rollupOptions: {
             input: {
                 main: 'index.html',
