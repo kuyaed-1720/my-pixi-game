@@ -98,6 +98,7 @@ export class Player extends Entity {
 
     private attack() {
         this.playAnimation('attack');
+        this.sprite.gotoAndPlay(0);
         this.sprite.loop = false;
         this.sprite.onComplete = () => {
             this.isAttacking = false;

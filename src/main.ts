@@ -110,6 +110,7 @@ async function init() {
 
             if (distance < 50 && hero.isAttacking) {
                 enemy.takeDamage(50);
+                hero.isAttacking = false;
             }
         }
 
