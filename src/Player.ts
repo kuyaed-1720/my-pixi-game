@@ -3,7 +3,7 @@ import { Entity } from "./Entity";
 
 export class Player extends Entity {
     private animations: Record<string, PIXI.AnimatedSprite>;
-    private currentState: string = 'idle';
+    public currentState: string = 'idle';
     private speed: number = 3;
     public isAttacking: boolean = false;
     private keys: Record<string, boolean> = {};
@@ -46,6 +46,7 @@ export class Player extends Entity {
             isMoving = true;
         }
         if (this.keys["Space"]) {
+            // this.playAnimation('attack');
             this.isAttacking = true;
         }
 
@@ -66,7 +67,8 @@ export class Player extends Entity {
         }
 
         if (this.isAttacking) {
-            this.attack();
+            this.isAttacking = false;
+            this.playAnimation('attack');
         } else if (isMoving) {
             this.playAnimation('walk');
         } else {
@@ -93,13 +95,20 @@ export class Player extends Entity {
         this.sprite.animationSpeed = 0.1;
 
         this.container.addChild(this.sprite);
-        this.sprite.play();
+        if (this.currentState === 'attack') {
+            this.attack();
+        } else {
+            this.sprite.play();
+        }
     }
 
     private attack() {
+        if (this.isAttacking) return;
+        this.isAttacking = true;
         this.playAnimation('attack');
-        this.sprite.gotoAndPlay(0);
-        this.sprite.loop = false;
+        const attackSprite = this.sprite;
+        attackSprite.gotoAndPlay(0);
+        attackSprite.loop = false;
         this.sprite.onComplete = () => {
             this.isAttacking = false;
             this.playAnimation('idle');

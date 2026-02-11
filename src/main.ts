@@ -110,7 +110,6 @@ async function init() {
 
             if (distance < 50 && hero.isAttacking) {
                 enemy.takeDamage(50);
-                hero.isAttacking = false;
             }
         }
 
@@ -147,6 +146,7 @@ async function init() {
 
             debugHud.innerHTML = `
                 X: ${hero.sprite.x.toFixed(2)} | Y: ${hero.sprite.y.toFixed(2)}<br>
+                State: ${hero.currentState}<br>
                 Inventory: ${inventoryText}<br>
                 Enemy: ${enemyText};
             `;
