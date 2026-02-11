@@ -104,8 +104,8 @@ export class Player extends Entity {
         this.sprite.loop = false;
         this.sprite.onComplete = () => {
             this.isAttacking = false;
-            this.sprite.loop = true;
             this.playAnimation('idle');
+            this.sprite.loop = true;
         };
     }
 }
