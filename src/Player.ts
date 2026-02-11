@@ -68,6 +68,7 @@ export class Player extends Entity {
 
         if (this.isAttacking) {
             this.playAnimation('attack');
+            this.sprite.loop = false;
         } else if (isMoving) {
             this.playAnimation('walk');
         } else {
@@ -98,8 +99,6 @@ export class Player extends Entity {
     }
 
     private attack() {
-        if (this.isAttacking) return;
-        this.isAttacking = true;
         this.playAnimation('attack');
         this.sprite.loop = false;
         this.sprite.onComplete = () => {
