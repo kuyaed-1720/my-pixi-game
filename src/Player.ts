@@ -47,7 +47,6 @@ export class Player extends Entity {
         }
         if (this.keys["Space"]) {
             this.isAttacking = true;
-            this.attack();
         }
 
         // Normalise speed
@@ -67,8 +66,7 @@ export class Player extends Entity {
         }
 
         if (this.isAttacking) {
-            this.playAnimation('attack');
-            this.sprite.loop = false;
+            this.attack();
         } else if (isMoving) {
             this.playAnimation('walk');
         } else {
