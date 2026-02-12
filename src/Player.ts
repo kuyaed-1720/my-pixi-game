@@ -13,11 +13,18 @@ export class Player extends Entity {
 
     public update(deltaTime: number) {
         const dt = Math.min(deltaTime, 0.1);
-        const dir = this.input.direction;
+
+        // Check for attack input
+        if (this.input.isAttacking && !this.isAttacking) {
+            this.isAttacking = true;
+            this.attack();
+        }
 
         // Calculate current max speed base on current sprinting state
-        const sprintMultiplier = this.input.isSprinting ? 1.5 : 1.0;
-        const currentMaxSpeed = this.stats['speed'] * sprintMultiplier;
+        const dir = this.input.direction;
+        const sprintMultiplier = this.input.isSprinting && !this.input.isAttacking ? 1.5 : 1.0;
+        const slowMultiplier = this.input.isAttacking && !this.input.isSprinting ? 0.5 : 1.0;
+        const currentMaxSpeed = this.stats['speed'] * sprintMultiplier * slowMultiplier;
 
         // Calculate target velocity based on input
         let target = { x: 0, y: 0 };
@@ -48,14 +55,15 @@ export class Player extends Entity {
         this.sprite.x += this.velocity.x * dt;
         this.sprite.y += this.velocity.y * dt;
 
-        // Handle sprite flipping
-        if (dir.x !== 0) this.sprite.scale.x = dir.x > 0 ? 4 : -4;
+        this.handleAnimations(dir);
+    }
 
-        // Play animation
-        if (this.isAttacking) {
-            this.attack();
-        } else if (dir.x !== 0 || dir.y !== 0) {
+    private handleAnimations(dir: { x: number, y: number }) {
+        if (this.isAttacking) return;
+
+        if (dir.x !== 0 || dir.y !== 0) {
             this.playAnimation('walk');
+            this.sprite.scale.x = dir.x > 0 ? 4 : -4;
         } else {
             this.playAnimation('idle');
         }
@@ -71,9 +79,6 @@ export class Player extends Entity {
     }
 
     private attack() {
-        // if (this.isAttacking) return;
-
-        // this.isAttacking = true;
         this.playAnimation('hit', false);
 
         this.sprite.onComplete = () => {
