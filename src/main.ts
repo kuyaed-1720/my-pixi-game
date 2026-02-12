@@ -80,11 +80,18 @@ async function init() {
     // app.ticker.maxFPS = 60;
     app.ticker.add((time) => {
         if (app.screen.width === 0 || !hero.sprite) return;
+        world.children.sort((a, b) => a.y - b.y);
 
         hero.update(time.deltaTime);
+        hero.drawHitbox(0x00ff00);
 
         enemies.forEach(enemy => {
             enemy.update(time.deltaTime);
+            enemy.drawHitbox(0xff0000);
+
+            if (checkCollision(hero.getBounds(), enemy.getBounds())) {
+                hero.takeDamage(enemy.stats['atk']);
+            }
         });
 
         const targetX = (app.screen.width / 2) - hero.sprite.x;
@@ -102,37 +109,13 @@ async function init() {
     });
 }
 
-// if (enemy && !enemy.isDestroyed) {
-//     const dx = hero.sprite.x - enemy.sprite.x;
-//     const dy = hero.sprite.y - enemy.sprite.y;
-//     const distance = Math.sqrt(dx * dx + dy * dy);
-
-//     if (distance < 50 && hero.isAttacking) {
-//         enemy.takeDamage(50);
-//     }
-// }
-
-// items.forEach(item => {
-//     if (!item.isCollected) {
-//         const dx = hero.sprite.x - item.sprite.x;
-//         const dy = hero.sprite.y - item.sprite.y;
-//         const distance = Math.sqrt(dx * dx + dy * dy);
-
-//         if (distance < 20) {
-//             const itemType = item.id;
-//             if (inventory.addItem(itemType)) {
-//                 item.collect();
-//             }
-//         }
-//     }
-// });
-//     let inventoryText = inventory.getSummary();
-
-//     let enemyText = '';
-
-// if (enemy && !enemy.isDestroyed) { enemyText = `X: ${enemy.sprite.x} Y: ${enemy.sprite.y} | ${enemy.health}`; }
-
-//         Inventory: ${inventoryText}<br>
-//         Enemy: ${enemyText};
+function checkCollision(rect1: any, rect2: any) {
+    return (
+        rect1.x < rect2.x + rect1.width &&
+        rect1.x + rect1.width > rect2.x &&
+        rect1.y < rect2.y + rect2.height &&
+        rect1.y + rect1.height > rect2.y
+    );
+}
 
 init();

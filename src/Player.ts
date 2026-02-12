@@ -75,6 +75,7 @@ export class Player extends Entity {
             (velocity) x: ${this.velocity.x.toFixed(2)} | y: ${this.velocity.y.toFixed(2)}<br>
             state: ${this.state}<br>
             isAttacking: ${this.isAttacking}<br>
+            health: ${this.stats['hp']}<br>
         `;
     }
 
