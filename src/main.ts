@@ -2,9 +2,9 @@ import { Application, Assets, Container, TextureSource } from "pixi.js";
 import { DungeonMap } from "./Map";
 import type { IEntityStats } from "./types/entityStats";
 import { Player } from "./Player";
+import { Enemy } from "./Enemy";
 
-// const items: Collectible[] = [];
-// const inventory: Inventory = new Inventory(3);
+const enemies: Enemy[] = [];
 
 async function init() {
     // Get the game container
@@ -34,50 +34,12 @@ async function init() {
 
     // Load the spritesheets
     const groundSheet = await Assets.load("grounds.png");
-    // const itemSheet = await PIXI.Assets.load("pickup_items_animated.png");
-    // const elfSheet = await PIXI.Assets.load("elf.png");
-    // const enemySheet = await PIXI.Assets.load("elf.png");
-
-    const sheet = await Assets.load('elf.json');
-    console.log("Available animations:", Object.keys(sheet.animations));
-
-    // Ready the animation frames
-    // const coinTexture = getAnimationFrames(itemSheet, 0, 3, 16, 16);
-    // const keyTexture = getAnimationFrames(itemSheet, 1, 3, 16, 16);
-    // const potionTexture = getAnimationFrames(itemSheet, 2, 3, 16, 16);
-    // const bombTexture = getAnimationFrames(itemSheet, 3, 3, 16, 16);
-    // const idleFrames = getAnimationFrames(elfSheet, 0, 3, 16, 16);
-    // const walkFrames = getAnimationFrames(elfSheet, 2, 4, 16, 16);
-    // const attackFrames = getAnimationFrames(elfSheet, 4, 5, 16, 16);
-    // const enemyIdleFrames = getAnimationFrames(enemySheet, 0, 3, 16, 16);
+    const playerSheet = await Assets.load('elf.json');
+    const slimeSheet = await Assets.load('slime.json');
 
     // Create the map
     const dungeon = new DungeonMap(groundSheet, 1, 4, 12, 9);
 
-    // Create items with animations
-    // const coin = new Collectible(coinTexture, 100, 100, "Coin");
-    // const bomb = new Collectible(bombTexture, 200, 100, "Bomb");
-    // const potion = new Collectible(potionTexture, 300, 100, "Potion");
-    // const key = new Collectible(keyTexture, 400, 100, "Key");
-    // const key2 = new Collectible(keyTexture, 200, 300, "Key");
-
-    // Create the player and initialize the animations
-    // const animations = {
-    //     idle: new PIXI.AnimatedSprite(idleFrames),
-    //     walk: new PIXI.AnimatedSprite(walkFrames),
-    //     attack: new PIXI.AnimatedSprite(attackFrames)
-    // };
-    // const enemyAnimations = {
-    //     idle: new PIXI.AnimatedSprite(enemyIdleFrames),
-    // };
-    // const hero = new Player(animations, 200, 'hero');
-    // const enemy = new Entity(enemyAnimations['idle'], 200, 'enemy');
-    // enemy.sprite.x = 500;
-    // enemy.sprite.y = 500;
-    // enemy.sprite.scale.set(4);
-    // enemy.sprite.anchor.set(0.5);
-    // enemy.sprite.animationSpeed = 0.1;
-    // enemy.sprite.play();
     const heroStats: IEntityStats = {
         hp: 200,
         maxHp: 200,
@@ -86,28 +48,33 @@ async function init() {
         acceleration: 2.5,
         deceleration: 4
     };
-    const hero = new Player(sheet.animations, heroStats);
-    // hero.x = app.screen.width / 2;
-    // hero.y = app.screen.height / 2;
+
+    const slimeStats: IEntityStats = {
+        hp: 300,
+        maxHp: 300,
+        atk: 20,
+        speed: 25,
+        acceleration: 0,
+        deceleration: 0
+    };
+
+    const hero = new Player(playerSheet.animations, heroStats);
 
     // Add to canvas
     const world = new Container();
     app.stage.addChild(world);
     world.addChild(dungeon.container);
-    // world.addChild(potion.sprite);
-    // world.addChild(coin.sprite);
-    // world.addChild(bomb.sprite);
-    // world.addChild(key.sprite);
-    // world.addChild(key2.sprite);
     world.addChild(hero);
-    // world.addChild(enemy);
 
-    // Add items to list of collectibles
-    // items.push(potion);
-    // items.push(key);
-    // items.push(key2);
-    // items.push(coin);
-    // items.push(bomb);
+    const slimeCount = 4;
+    for (let i = 0; i < slimeCount; i++) {
+        const slime = new Enemy(slimeSheet.animations, slimeStats, hero);
+        slime.sprite.x = 200 + (1 * 100);
+        slime.sprite.y = 200 + (i * 100);
+
+        enemies.push(slime);
+        world.addChild(slime);
+    }
 
     // Update the game
     // app.ticker.maxFPS = 60;
@@ -115,6 +82,10 @@ async function init() {
         if (app.screen.width === 0 || !hero.sprite) return;
 
         hero.update(time.deltaTime);
+
+        enemies.forEach(enemy => {
+            enemy.update(time.deltaTime);
+        });
 
         const targetX = (app.screen.width / 2) - hero.sprite.x;
         const targetY = (app.screen.height / 2) - hero.sprite.y;

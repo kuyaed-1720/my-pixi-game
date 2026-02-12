@@ -23,7 +23,7 @@ export class Enemy extends Entity {
         let target = { x: 0, y: 0 };
 
         // Only chase player if inside range
-        if (distance < this.chaseRange && distance > 20) {
+        if (distance < this.chaseRange && distance > 32) {
             target.x = (distanceX / distance) * this.stats['speed'];
             target.y = (distanceY / distance) * this.stats['speed'];
             this.playAnimation('walk');
