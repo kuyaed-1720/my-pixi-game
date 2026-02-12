@@ -12,6 +12,10 @@ export class InputManager {
         return { x, y };
     }
 
+    public get isSprinting(): boolean {
+        return !!(this.keys['Shiftleft'] || this.keys['ShiftRight']);
+    }
+
     public get isAttacking(): boolean {
         return !!(this.keys['Space'] || this.keys['KeyK'] || this.keys['KeyJ']);
     }

@@ -15,13 +15,17 @@ export class Player extends Entity {
         const dt = Math.min(deltaTime, 0.1);
         const dir = this.input.direction;
 
+        // Calculate current max speed base on current sprinting state
+        const sprintMultiplier = this.input.isSprinting ? 1.5 : 1.0;
+        const currentMaxSpeed = this.stats['speed'] * sprintMultiplier;
+
         // Calculate target velocity based on input
         let target = { x: 0, y: 0 };
         const length = Math.sqrt(dir.x ** 2 + dir.y ** 2);
         if (length > 0) {
             target = {
-                x: (dir.x / length) * this.stats['speed'],
-                y: (dir.y / length) * this.stats['speed']
+                x: (dir.x / length) * currentMaxSpeed,
+                y: (dir.y / length) * currentMaxSpeed
             };
         }
 
@@ -37,9 +41,9 @@ export class Player extends Entity {
         if (Math.abs(this.velocity.y) < 0.01) this.velocity.y = 0;
 
         // Clamp the velocity to avoid exceeding from max speed
-        const max = this.stats['speed'] * 2;
-        this.velocity.x = Math.max(-max, Math.min(max, this.velocity.x));
-        this.velocity.y = Math.max(-max, Math.min(max, this.velocity.y));
+        const speedLimit = this.stats['speed'] * 2;
+        this.velocity.x = Math.max(-speedLimit, Math.min(speedLimit, this.velocity.x));
+        this.velocity.y = Math.max(-speedLimit, Math.min(speedLimit, this.velocity.y));
 
         this.sprite.x += this.velocity.x * dt;
         this.sprite.y += this.velocity.y * dt;
