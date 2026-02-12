@@ -1,0 +1,48 @@
+import { Entity } from "./Entity";
+import type { Player } from "./Player";
+
+export class Enemy extends Entity {
+    private target: Player | null = null;
+    private chaseRange: number = 500;
+    private velocity = { x: 0, y: 0 };
+
+    constructor(animations: any, stats: any, target: Player) {
+        super(animations, stats);
+        this.target = target;
+    }
+
+    public update(deltaTime: number) {
+        const dt = Math.min(deltaTime, 0.1);
+        if (!this.target || this.target.isDestroyed) return;
+
+        // Calculate distance to player
+        const distanceX = this.target.sprite.x - this.sprite.x;
+        const distanceY = this.target.sprite.y - this.sprite.y;
+        const distance = Math.sqrt(distanceX ** 2 + distanceY ** 2);
+
+        let target = { x: 0, y: 0 };
+
+        // Only chase player if inside range
+        if (distance < this.chaseRange && distance > 20) {
+            target.x = (distanceX / distance) * this.stats['speed'];
+            target.y = (distanceY / distance) * this.stats['speed'];
+            this.playAnimation('walk');
+            this.sprite.scale.x = distanceX > 0 ? 4 : -4;
+        } else {
+            this.playAnimation('idle');
+        }
+
+        // Velocity Interpolation
+        const weight = 0.1;
+        this.velocity.x += (target.x - this.velocity.x) * weight * dt;
+        this.velocity.y += (target.y - this.velocity.y) * weight * dt;
+
+        // Snap to zero
+        if (Math.abs(this.velocity.x) < 0.01) this.velocity.x = 0;
+        if (Math.abs(this.velocity.y) < 0.01) this.velocity.y = 0;
+
+        // Update location
+        this.sprite.x += this.velocity.x * dt;
+        this.sprite.y += this.velocity.y * dt;
+    }
+}
