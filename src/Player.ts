@@ -1,118 +1,80 @@
-import * as PIXI from "pixi.js";
-import { Entity } from "./Entity";
+import { Entity, type AnimationMap } from "./Entity";
+import { InputManager } from "./InputManager";
+import type { IEntityStats } from "./types/entityStats";
 
 export class Player extends Entity {
-    private animations: Record<string, PIXI.AnimatedSprite>;
-    public currentState: string = 'idle';
-    private speed: number = 3;
-    public isAttacking: boolean = false;
-    private keys: Record<string, boolean> = {};
+    private input: InputManager;
+    private velocity = { x: 0, y: 0 };
 
-    constructor(animations: Record<string, PIXI.AnimatedSprite>, health: number, id: string) {
-        super(animations['idle'], health, id);
-        this.animations = animations;
-        this.sprite.scale.set(4);
-        this.sprite.anchor.set(0.5);
-        this.playAnimation('idle');
-
-        window.addEventListener("keydown", (e) => (this.keys[e.code] = true));
-        window.addEventListener("keyup", (e) => (this.keys[e.code] = false));
+    constructor(animations: AnimationMap, stats: IEntityStats) {
+        super(animations, stats);
+        this.input = new InputManager();
     }
 
     public update(deltaTime: number) {
-        if (this.isDestroyed) {
-            return;
+        const dt = Math.min(deltaTime, 0.1);
+        const dir = this.input.direction;
+
+        // Calculate target velocity based on input
+        let target = { x: 0, y: 0 };
+        const length = Math.sqrt(dir.x ** 2 + dir.y ** 2);
+        if (length > 0) {
+            target = {
+                x: (dir.x / length) * this.stats['speed'],
+                y: (dir.y / length) * this.stats['speed']
+            };
         }
 
-        let moveX = 0;
-        let moveY = 0;
-        let isMoving = false;
+        // Add acceleration or deceleration
+        const weight = length > 0 ? this.stats['acceleration'] : this.stats['deceleration'];
 
-        // Capture direction
-        if (this.keys["KeyW"]) {
-            moveY -= 1;
-            isMoving = true;
-        }
-        if (this.keys["KeyS"]) {
-            moveY += 1;
-            isMoving = true;
-        }
-        if (this.keys["KeyA"]) {
-            moveX -= 1;
-            isMoving = true;
-        }
-        if (this.keys["KeyD"]) {
-            moveX += 1;
-            isMoving = true;
-        }
-        if (this.keys["Space"]) {
-            // this.playAnimation('attack');
-            this.isAttacking = true;
-        }
+        // Velocity Interpolation
+        this.velocity.x += (target.x - this.velocity.x) * weight * dt;
+        this.velocity.y += (target.y - this.velocity.y) * weight * dt;
 
-        // Normalise speed
-        if (isMoving) {
-            const length = Math.sqrt(moveX * moveX + moveY * moveY);
+        // Snap to zero
+        if (Math.abs(this.velocity.x) < 0.01) this.velocity.x = 0;
+        if (Math.abs(this.velocity.y) < 0.01) this.velocity.y = 0;
 
-            if (length > 0) {
-                const velocityX = (moveX / length) * this.speed;
-                const velocityY = (moveY / length) * this.speed;
+        // Clamp the velocity to avoid exceeding from max speed
+        const max = this.stats['speed'] * 2;
+        this.velocity.x = Math.max(-max, Math.min(max, this.velocity.x));
+        this.velocity.y = Math.max(-max, Math.min(max, this.velocity.y));
 
-                this.sprite.x += velocityX * deltaTime;
-                this.sprite.y += velocityY * deltaTime;
-            }
+        this.sprite.x += this.velocity.x * dt;
+        this.sprite.y += this.velocity.y * dt;
 
-            // Handle sprite flipping
-            if (moveX !== 0) this.sprite.scale.x = moveX > 0 ? 4 : -4;
-        }
+        // Handle sprite flipping
+        if (dir.x !== 0) this.sprite.scale.x = dir.x > 0 ? 4 : -4;
 
+        // Play animation
         if (this.isAttacking) {
-            this.isAttacking = false;
-            this.playAnimation('attack');
-        } else if (isMoving) {
+            this.attack();
+        } else if (dir.x !== 0 || dir.y !== 0) {
             this.playAnimation('walk');
         } else {
             this.playAnimation('idle');
-        };
-    }
-
-    public playAnimation(key: string) {
-        if (this.currentState === key) return;
-
-        const oldX = this.sprite.x;
-        const oldY = this.sprite.y;
-
-        this.container.removeChild(this.sprite);
-        this.sprite.stop();
-
-        this.currentState = key;
-        this.sprite = this.animations[key];
-
-        this.sprite.scale.set(4);
-        this.sprite.anchor.set(0.5);
-        this.sprite.x = oldX;
-        this.sprite.y = oldY;
-        this.sprite.animationSpeed = 0.1;
-
-        this.container.addChild(this.sprite);
-        if (this.currentState === 'attack') {
-            this.attack();
-        } else {
-            this.sprite.play();
         }
     }
 
+    public getPlayerSummary() {
+        return `
+            (location) x: ${this.sprite.x.toFixed(2)} | y: ${this.sprite.y.toFixed(2)}<br>
+            (velocity) x: ${this.velocity.x.toFixed(2)} | y: ${this.velocity.y.toFixed(2)}<br>
+            state: ${this.state}<br>
+            isAttacking: ${this.isAttacking}<br>
+        `;
+    }
+
     private attack() {
-        if (this.isAttacking) return;
-        this.isAttacking = true;
-        this.playAnimation('attack');
-        const attackSprite = this.sprite;
-        attackSprite.gotoAndPlay(0);
-        attackSprite.loop = false;
+        // if (this.isAttacking) return;
+
+        // this.isAttacking = true;
+        this.playAnimation('hit', false);
+
         this.sprite.onComplete = () => {
             this.isAttacking = false;
             this.playAnimation('idle');
-            this.sprite.loop = true;
         };
     }
 }

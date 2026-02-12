@@ -1,23 +1,44 @@
-import * as PIXI from 'pixi.js';
+import { AnimatedSprite, Container, Texture } from "pixi.js";
+import type { IEntityStats } from "./types/entityStats";
 
-export class Entity {
-    public container: PIXI.Container;
-    public sprite: PIXI.AnimatedSprite;
-    public health: number = 100;
-    public id: string;
+export type AnimationMap = { [key: string]: Texture[] };
+
+export class Entity extends Container {
+    protected animations: AnimationMap;
+    public sprite: AnimatedSprite;
+    public stats: IEntityStats;
+    public state: string = 'idle';
+
+    public isAttacking: boolean = false;
     public isDestroyed: boolean = false;
 
-    constructor(texture: PIXI.AnimatedSprite, health: number, id: string) {
-        this.container = new PIXI.Container();
-        this.sprite = texture;
-        this.container.addChild(this.sprite);
-        this.health = health;
-        this.id = id;
+    constructor(animations: AnimationMap, stats: IEntityStats) {
+        super();
+        this.animations = animations;
+        this.stats = stats;
+        this.sprite = new AnimatedSprite(this.animations['idle']);
+        this.sprite.scale.set(4);
+        this.sprite.anchor.set(0.5);
+        this.sprite.animationSpeed = 0.1;
+        this.sprite.play();
+        this.addChild(this.sprite);
+    }
+
+    public playAnimation(name: string, loop: boolean = true) {
+        if (this.state === name) return;
+
+        const newTextures = this.animations[name];
+        if (newTextures) {
+            this.sprite.textures = newTextures;
+            this.sprite.loop = loop;
+            this.sprite.gotoAndPlay(0);
+            this.state = name;
+        }
     }
 
     public takeDamage(amount: number) {
-        this.health -= amount;
-        if (this.health <= 0) this.onDeath();
+        this.stats['hp'] -= amount;
+        if (this.stats['hp'] <= 0) this.onDeath();
     }
 
     public onDeath() {
