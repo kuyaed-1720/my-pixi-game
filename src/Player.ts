@@ -12,7 +12,16 @@ export class Player extends Entity {
     }
 
     public update(deltaTime: number) {
+        // For debug
+        this.drawHitbox(0x00ff00, 16);
         const dt = Math.min(deltaTime, 0.1);
+        if (this.damageCooldown > 0) {
+            this.damageCooldown -= dt;
+
+            if (this.damageCooldown <= 0) {
+                this.sprite.tint = 0xffffff;
+            }
+        }
 
         // Check for attack input
         if (this.input.isAttacking && !this.isAttacking) {
@@ -52,8 +61,8 @@ export class Player extends Entity {
         this.velocity.x = Math.max(-speedLimit, Math.min(speedLimit, this.velocity.x));
         this.velocity.y = Math.max(-speedLimit, Math.min(speedLimit, this.velocity.y));
 
-        this.sprite.x += this.velocity.x * dt;
-        this.sprite.y += this.velocity.y * dt;
+        this.x += this.velocity.x * dt;
+        this.y += this.velocity.y * dt;
 
         this.handleAnimations(dir);
     }
@@ -71,8 +80,9 @@ export class Player extends Entity {
 
     public getPlayerSummary() {
         return `
-            (location) x: ${this.sprite.x.toFixed(2)} | y: ${this.sprite.y.toFixed(2)}<br>
+            (location) x: ${this.x.toFixed(2)} | y: ${this.y.toFixed(2)}<br>
             (velocity) x: ${this.velocity.x.toFixed(2)} | y: ${this.velocity.y.toFixed(2)}<br>
+            (dimensions) w: ${this.width} | h: ${this.height}<br>
             state: ${this.state}<br>
             isAttacking: ${this.isAttacking}<br>
             health: ${this.stats['hp']}<br>

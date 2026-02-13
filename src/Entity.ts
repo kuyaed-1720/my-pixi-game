@@ -1,9 +1,12 @@
 import { AnimatedSprite, Container, Graphics, Texture } from "pixi.js";
 import type { IEntityStats } from "./types/entityStats";
+import type { IRectangle } from "./Collision";
 
 export type AnimationMap = { [key: string]: Texture[] };
 
 export class Entity extends Container {
+    public damageCooldown: number = 0;
+    private readonly IFRAME_DURATION: number = 60;
     protected debugGraphic: Graphics;
     protected animations: AnimationMap;
     public sprite: AnimatedSprite;
@@ -22,19 +25,36 @@ export class Entity extends Container {
         this.sprite.scale.set(4);
         this.sprite.anchor.set(0.5);
         this.sprite.animationSpeed = 0.1;
-        this.sprite.addChild(this.debugGraphic);
         this.addChild(this.sprite);
+        this.addChild(this.debugGraphic);
         this.sprite.play();
     }
 
-    public drawHitbox(color: number = 0xff0000) {
+    public drawHitbox(color: number = 0xff0000, size: number) {
         this.debugGraphic.clear();
-        this.debugGraphic.fill(color, 0.5);
-        const w = this.sprite.width * 0.4;
-        const h = this.sprite.height * 0.6;
+        const scale = 4;
 
-        this.debugGraphic.rect(-1 / 2, -h / 2, w, h);
+        const localWidth = size * scale / 2;
+        const localHeight = size * scale / 2;
+
+        this.debugGraphic.rect(-localWidth / 2, -localHeight / 2, localWidth, localHeight)
+            .fill({ color: color, alpha: 0.5 });
     }
+
+    /**
+     * Get the dimensions of the hitbox
+     * @param sprite 
+     * @returns Rectangle
+     */
+    public getHitbox(width: number = 16, height: number = 16): IRectangle {
+        return {
+            x: this.x - width / 2,
+            y: this.y - height / 2,
+            width: width,
+            height: height
+        };
+    }
+
     public playAnimation(name: string, loop: boolean = true) {
         if (this.state === name) return;
 
@@ -47,12 +67,13 @@ export class Entity extends Container {
         }
     }
 
-    public getBounds() {
-        return this.sprite.getBounds();
-    }
-
     public takeDamage(amount: number) {
+        if (this.damageCooldown > 0) return;
+
         this.stats['hp'] -= amount;
+        this.damageCooldown = this.IFRAME_DURATION;
+        this.sprite.tint = 0xff0000;
+
         if (this.stats['hp'] <= 0) this.onDeath();
     }
 

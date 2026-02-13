@@ -3,6 +3,7 @@ import { DungeonMap } from "./Map";
 import type { IEntityStats } from "./types/entityStats";
 import { Player } from "./Player";
 import { Enemy } from "./Enemy";
+import { Collision } from "./Collision";
 
 const enemies: Enemy[] = [];
 
@@ -69,8 +70,8 @@ async function init() {
     const slimeCount = 4;
     for (let i = 0; i < slimeCount; i++) {
         const slime = new Enemy(slimeSheet.animations, slimeStats, hero);
-        slime.sprite.x = 200 + (1 * 100);
-        slime.sprite.y = 200 + (i * 100);
+        slime.x = 200 + (1 * 100);
+        slime.y = 200 + (i * 100);
 
         enemies.push(slime);
         world.addChild(slime);
@@ -79,23 +80,21 @@ async function init() {
     // Update the game
     // app.ticker.maxFPS = 60;
     app.ticker.add((time) => {
-        if (app.screen.width === 0 || !hero.sprite) return;
+        if (app.screen.width === 0 || !hero) return;
         world.children.sort((a, b) => a.y - b.y);
 
         hero.update(time.deltaTime);
-        hero.drawHitbox(0x00ff00);
 
         enemies.forEach(enemy => {
             enemy.update(time.deltaTime);
-            enemy.drawHitbox(0xff0000);
 
-            if (checkCollision(hero.getBounds(), enemy.getBounds())) {
+            if (Collision.check(hero.getHitbox(), enemy.getHitbox())) {
                 hero.takeDamage(enemy.stats['atk']);
             }
         });
 
-        const targetX = (app.screen.width / 2) - hero.sprite.x;
-        const targetY = (app.screen.height / 2) - hero.sprite.y;
+        const targetX = (app.screen.width / 2) - hero.x;
+        const targetY = (app.screen.height / 2) - hero.y;
 
         if (!isNaN(targetX) && !isNaN(targetY)) {
             world.x = targetX;
@@ -107,15 +106,6 @@ async function init() {
             debugHud.innerHTML = hero.getPlayerSummary();
         }
     });
-}
-
-function checkCollision(rect1: any, rect2: any) {
-    return (
-        rect1.x < rect2.x + rect1.width &&
-        rect1.x + rect1.width > rect2.x &&
-        rect1.y < rect2.y + rect2.height &&
-        rect1.y + rect1.height > rect2.y
-    );
 }
 
 init();

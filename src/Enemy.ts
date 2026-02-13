@@ -12,12 +12,13 @@ export class Enemy extends Entity {
     }
 
     public update(deltaTime: number) {
+        this.drawHitbox(0xff0000, 16);
         const dt = Math.min(deltaTime, 0.1);
         if (!this.target || this.target.isDestroyed) return;
 
         // Calculate distance to player
-        const distanceX = this.target.sprite.x - this.sprite.x;
-        const distanceY = this.target.sprite.y - this.sprite.y;
+        const distanceX = this.target.x - this.x;
+        const distanceY = this.target.y - this.y;
         const distance = Math.sqrt(distanceX ** 2 + distanceY ** 2);
 
         let target = { x: 0, y: 0 };
@@ -42,7 +43,7 @@ export class Enemy extends Entity {
         if (Math.abs(this.velocity.y) < 0.01) this.velocity.y = 0;
 
         // Update location
-        this.sprite.x += this.velocity.x * dt;
-        this.sprite.y += this.velocity.y * dt;
+        this.x += this.velocity.x * dt;
+        this.y += this.velocity.y * dt;
     }
 }
