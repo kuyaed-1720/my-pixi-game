@@ -1,6 +1,6 @@
 import { Entity, type AnimationMap } from "./Entity";
 import { InputManager } from "./InputManager";
-import type { IEntityStats } from "./types/entityStats";
+import type { IEntityStats } from "./types";
 
 export class Player extends Entity {
     private input: InputManager;
@@ -13,7 +13,7 @@ export class Player extends Entity {
 
     public update(deltaTime: number) {
         // For debug
-        this.drawHitbox(0x00ff00, 16);
+        this.drawHitbox(0x00ff00);
         const dt = Math.min(deltaTime, 0.1);
         if (this.damageCooldown > 0) {
             this.damageCooldown -= dt;

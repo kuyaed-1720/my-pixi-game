@@ -1,6 +1,6 @@
 import { Application, Assets, Container, TextureSource } from "pixi.js";
 import { DungeonMap } from "./Map";
-import type { IEntityStats } from "./types/entityStats";
+import type { IEntityStats } from "./types";
 import { Player } from "./Player";
 import { Enemy } from "./Enemy";
 import { Collision } from "./Collision";

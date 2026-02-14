@@ -12,7 +12,7 @@ export class Enemy extends Entity {
     }
 
     public update(deltaTime: number) {
-        this.drawHitbox(0xff0000, 16);
+        this.drawHitbox(0xff0000);
         const dt = Math.min(deltaTime, 0.1);
         if (!this.target || this.target.isDestroyed) return;
 
