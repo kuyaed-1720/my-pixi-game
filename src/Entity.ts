@@ -124,23 +124,25 @@ export class Entity extends Container {
     /**
      * Applies damage, a physical shove to entity, and triggers invulnerability frames.
      * @param amount - The amount of HP to deduct.
-     * @param sourcePos - The position of the attacker to calculate push direction.
-     * @param power - How far the entity is thrown back.
+     * @param source - The entity attacking
      */
-    public takeDamage(amount: number, sourcePos?: IVector2D, power: number = 200): void {
+    public takeDamage(amount: number, source?: Entity): void {
         if (this.damageCooldown > 0 || this.isDestroyed) return;
 
         this.stats['hp'] -= amount;
         this.damageCooldown = this.IFRAME_DURATION;
         this.sprite.tint = 0xff0000;
 
-        if (sourcePos) {
-            const dx = this.x - sourcePos.x;
-            const dy = this.y - sourcePos.y;
+        if (source) {
+            const dx = this.x - source.x;
+            const dy = this.y - source.y;
             const dist = Math.sqrt(dx ** 2 + dy ** 2) || 1;
 
-            this.externalForce.x = (dx / dist) * power;
-            this.externalForce.y = (dy / dist) * power;
+            // Scale knockback power base on attack
+            const powerScaling = (source.stats['atk'] * 10);
+
+            this.externalForce.x = (dx / dist) * powerScaling;
+            this.externalForce.y = (dy / dist) * powerScaling;
         }
 
         if (this.stats['hp'] <= 0) this.onDeath();
