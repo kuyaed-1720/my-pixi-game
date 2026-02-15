@@ -127,7 +127,7 @@ export class Entity extends Container {
      * @param sourcePos - The position of the attacker to calculate push direction.
      * @param power - How far the entity is thrown back.
      */
-    public takeDamage(amount: number, sourcePos?: IVector2D, power: number = 300): void {
+    public takeDamage(amount: number, sourcePos?: IVector2D, power: number = 200): void {
         if (this.damageCooldown > 0 || this.isDestroyed) return;
 
         this.stats['hp'] -= amount;
