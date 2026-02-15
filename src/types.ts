@@ -13,6 +13,15 @@ export type AnimationMap = {
 };
 
 /**
+ * Defines a circular area for high-performance procimity and collision checks.
+ */
+export interface ICircle {
+    x: number;
+    y: number;
+    radius: number;
+}
+
+/**
  * Core attributes for any living entity in the game.
  */
 export interface IEntityStats {
@@ -40,6 +49,14 @@ export interface IRectangle {
     y: number;
     /** Scaled width of the object. */
     width: number;
-    /** Scaled height of the opbject. */
+    /** Scaled height of the object. */
     height: number;
+}
+
+/**
+ * Simple 2D coordinate or vector representation.
+ */
+export interface IVector2D {
+    x: number;
+    y: number;
 }

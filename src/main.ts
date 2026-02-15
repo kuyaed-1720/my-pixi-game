@@ -88,8 +88,8 @@ async function init() {
         enemies.forEach(enemy => {
             enemy.update(time.deltaTime);
 
-            if (Collision.check(hero.getHitbox(), enemy.getHitbox())) {
-                hero.takeDamage(enemy.stats['atk']);
+            if (Collision.checkCircle(hero.getCollisionCircle(), enemy.getCollisionCircle())) {
+                hero.takeDamage(enemy.stats['atk'], enemy);
             }
         });
 

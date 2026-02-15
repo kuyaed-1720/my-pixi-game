@@ -1,68 +1,82 @@
 import { Entity, type AnimationMap } from "./Entity";
 import { InputManager } from "./InputManager";
-import type { IEntityStats } from "./types";
+import { snapToZero } from "./math";
+import type { IEntityStats, IVector2D } from "./types";
 
+/**
+ * The main player-controlled character.
+ * Handles input processing,p physics interpolation, and state-based animations.
+ */
 export class Player extends Entity {
     private input: InputManager;
-    private velocity = { x: 0, y: 0 };
+    private velocity: IVector2D = { x: 0, y: 0 };
+
+    private readonly ATTACK_SLOW_MULTIPLIER: number = 0.5;
+    private readonly VELOCITY_THRESHOLD: number = 0.1;
 
     constructor(animations: AnimationMap, stats: IEntityStats) {
         super(animations, stats);
         this.input = new InputManager();
     }
 
-    public update(deltaTime: number) {
-        // For debug
-        this.drawHitbox(0x00ff00);
+    /**
+     * Updates player physics and animations every frame.
+     * @param deltaTime - Time elapsed since last frame.
+     */
+    public update(deltaTime: number): void {
+        super.update(deltaTime);
         const dt = Math.min(deltaTime, 0.1);
-        if (this.damageCooldown > 0) {
-            this.damageCooldown -= dt;
 
-            if (this.damageCooldown <= 0) {
-                this.sprite.tint = 0xffffff;
-            }
-        }
-
-        // Check for attack input
         if (this.input.isAttacking && !this.isAttacking) {
             this.isAttacking = true;
             this.attack();
         }
 
-        // Calculate current max speed base on current sprinting state
+        this.applyMovementPhysics(dt);
+
+    }
+
+    /**
+     * Calculates velocity using interpolation for smooth acceleration and friction.
+     */
+    private applyMovementPhysics(dt: number): void {
         const dir = this.input.direction;
-        const sprintMultiplier = this.input.isSprinting && !this.input.isAttacking ? 1.5 : 1.0;
-        const slowMultiplier = this.input.isAttacking && !this.input.isSprinting ? 0.5 : 1.0;
+
+        const canSprint = this.input.isSprinting && !this.isAttacking;
+        const sprintMultiplier = canSprint ? 1.5 : 1.0;
+
+        const slowMultiplier = this.isAttacking ? this.ATTACK_SLOW_MULTIPLIER : 1.0;
         const currentMaxSpeed = this.stats['speed'] * sprintMultiplier * slowMultiplier;
 
-        // Calculate target velocity based on input
-        let target = { x: 0, y: 0 };
+        // Calculate target velocity
+        const target = { x: 0, y: 0 };
         const length = Math.sqrt(dir.x ** 2 + dir.y ** 2);
         if (length > 0) {
-            target = {
-                x: (dir.x / length) * currentMaxSpeed,
-                y: (dir.y / length) * currentMaxSpeed
-            };
+            target.x = (dir.x / length) * currentMaxSpeed;
+            target.y = (dir.y / length) * currentMaxSpeed;
         }
 
-        // Add acceleration or deceleration
+        // Apply acceleration or deceleration
         const weight = length > 0 ? this.stats['acceleration'] : this.stats['deceleration'];
 
         // Velocity Interpolation
         this.velocity.x += (target.x - this.velocity.x) * weight * dt;
         this.velocity.y += (target.y - this.velocity.y) * weight * dt;
 
-        // Snap to zero
-        if (Math.abs(this.velocity.x) < 0.01) this.velocity.x = 0;
-        if (Math.abs(this.velocity.y) < 0.01) this.velocity.y = 0;
+        // Snap to zero: Prevents infinite micro-movements
+        snapToZero(this.velocity, this.VELOCITY_THRESHOLD);
 
-        // Clamp the velocity to avoid exceeding from max speed
-        const speedLimit = this.stats['speed'] * 2;
-        this.velocity.x = Math.max(-speedLimit, Math.min(speedLimit, this.velocity.x));
-        this.velocity.y = Math.max(-speedLimit, Math.min(speedLimit, this.velocity.y));
+        // Knoickback decay
+        if (Math.abs(this.externalForce.x) > 0 || Math.abs(this.externalForce.y) > 0) {
+            this.externalForce.x *= 1 - (this.friction * dt);
+            this.externalForce.y *= 1 - (this.friction * dt);
 
-        this.x += this.velocity.x * dt;
-        this.y += this.velocity.y * dt;
+            snapToZero(this.externalForce, 0.2);
+        }
+
+        // Final position update
+        this.x += (this.velocity.x + this.externalForce.x) * dt;
+        this.y += (this.velocity.y + this.externalForce.y) * dt;
 
         this.handleAnimations(dir);
     }
@@ -86,6 +100,9 @@ export class Player extends Entity {
             state: ${this.state}<br>
             isAttacking: ${this.isAttacking}<br>
             health: ${this.stats['hp']}<br>
+            cooldown: ${this.damageCooldown.toFixed(2)}<br>
+            friction: ${this.friction}<br>
+            (force) x: ${this.externalForce.x.toFixed(2)} | y: ${this.externalForce.y.toFixed(2)}<br>
         `;
     }
 

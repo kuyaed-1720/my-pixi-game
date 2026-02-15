@@ -1,5 +1,5 @@
 import { AnimatedSprite, Container, Graphics, Texture } from "pixi.js";
-import type { IEntityStats, IRectangle } from "./types";
+import type { ICircle, IEntityStats, IRectangle, IVector2D } from "./types";
 
 export type AnimationMap = { [key: string]: Texture[] };
 
@@ -16,12 +16,14 @@ export class Entity extends Container {
     public sprite: AnimatedSprite;
     public stats: IEntityStats;
 
-    private readonly IFRAME_DURATION: number = 10;
+    private readonly IFRAME_DURATION: number = 60;
     private readonly SPRITE_SCALE: number = 4;
 
     protected debugGraphic: Graphics;
     protected animations: AnimationMap;
     protected hitBox: { width: number, height: number } = { width: 0, height: 0 };
+    protected externalForce: IVector2D = { x: 0, y: 0 };
+    protected friction: number = 1.5
 
     constructor(animations: AnimationMap, stats: IEntityStats) {
         super();
@@ -35,7 +37,7 @@ export class Entity extends Container {
         this.sprite.anchor.set(0.5);
         this.sprite.animationSpeed = 0.1;
 
-        this.hitBox = { width: this.sprite.width, height: this.sprite.height };
+        this.hitBox = { width: this.sprite.width * 0.5, height: this.sprite.height * 0.6 };
 
         this.addChild(this.sprite);
         this.addChild(this.debugGraphic);
@@ -43,17 +45,39 @@ export class Entity extends Container {
     }
 
     /**
+     * Process the entity's logic for a single frame.
+     * Includes damage cooldown management and visual updates.
+     * @param dt - The delta time from the game ticker.
+     */
+    public update(dt: number): void {
+        if (this.damageCooldown > 0) {
+            this.damageCooldown -= dt;
+
+            if (this.damageCooldown <= 0) {
+                this.sprite.tint = 0xffffff;
+                this.damageCooldown = 0;
+            }
+        }
+
+        if (this.debugGraphic.visible) {
+            this.drawHitbox();
+        }
+    }
+
+    /**
      * Draws hitbox of entity base on the size and scale of sprite.
      * @param color - The hex color used to fill the debug rectangle.
      */
-    public drawHitbox(color: number = 0xff0000) {
+    public drawHitbox(color: number = 0xff0000): void {
         this.debugGraphic.clear();
 
-        const width = this.sprite.width * this.SPRITE_SCALE / 2;
-        const height = this.sprite.height * this.SPRITE_SCALE / 2;
+        const width = this.hitBox.width;
+        const height = this.hitBox.height;
+        const cornerRadius = Math.min(width, height) / 2;
 
-        this.debugGraphic.rect(-width / 2, -height / 2, width, height)
-            .fill({ color: color, alpha: 0.5 });
+        this.debugGraphic
+            .roundRect(-width / 2, -height / 2, width, height, cornerRadius)
+            .fill({ color, alpha: 0.5 });
     }
 
     /**
@@ -66,6 +90,17 @@ export class Entity extends Container {
             y: this.y - this.hitBox.height / 2,
             width: this.hitBox.width,
             height: this.hitBox.height
+        };
+    }
+
+    /**
+     * Returns a circular representation of the entity.
+     */
+    public getCollisionCircle(): ICircle {
+        return {
+            x: this.x,
+            y: this.y,
+            radius: (this.hitBox.width / 2)
         };
     }
 
@@ -87,15 +122,26 @@ export class Entity extends Container {
     }
 
     /**
-     * Applies damage and triggers invulnerability frames.
+     * Applies damage, a physical shove to entity, and triggers invulnerability frames.
      * @param amount - The amount of HP to deduct.
+     * @param sourcePos - The position of the attacker to calculate push direction.
+     * @param power - How far the entity is thrown back.
      */
-    public takeDamage(amount: number): void {
-        if (this.damageCooldown > 0) return;
+    public takeDamage(amount: number, sourcePos?: IVector2D, power: number = 300): void {
+        if (this.damageCooldown > 0 || this.isDestroyed) return;
 
         this.stats['hp'] -= amount;
         this.damageCooldown = this.IFRAME_DURATION;
         this.sprite.tint = 0xff0000;
+
+        if (sourcePos) {
+            const dx = this.x - sourcePos.x;
+            const dy = this.y - sourcePos.y;
+            const dist = Math.sqrt(dx ** 2 + dy ** 2) || 1;
+
+            this.externalForce.x = (dx / dist) * power;
+            this.externalForce.y = (dy / dist) * power;
+        }
 
         if (this.stats['hp'] <= 0) this.onDeath();
     }
