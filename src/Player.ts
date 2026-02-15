@@ -1,4 +1,5 @@
 import { Entity, type AnimationMap } from "./Entity";
+import { Collision } from "./Collision";
 import { InputManager } from "./InputManager";
 import { snapToZero } from "./math";
 import type { IEntityStats, IVector2D } from "./types";
@@ -12,6 +13,8 @@ export class Player extends Entity {
     private velocity: IVector2D = { x: 0, y: 0 };
 
     private readonly ATTACK_SLOW_MULTIPLIER: number = 0.5;
+    private readonly ATK_RADIUS: number = 48;
+    private readonly ATK_OFFSET: number = 80;
     private readonly VELOCITY_THRESHOLD: number = 0.1;
 
     constructor(animations: AnimationMap, stats: IEntityStats) {
@@ -27,13 +30,13 @@ export class Player extends Entity {
         super.update(deltaTime);
         const dt = Math.min(deltaTime, 0.1);
 
-        if (this.input.isAttacking && !this.isAttacking) {
-            this.isAttacking = true;
-            this.attack();
-        }
-
         this.applyMovementPhysics(dt);
+    }
 
+    public handleAttack(enemies: Entity[]) {
+        if (this.input.isAttacking && !this.isAttacking) {
+            this.performAttack(enemies);
+        }
     }
 
     /**
@@ -66,7 +69,7 @@ export class Player extends Entity {
         // Snap to zero: Prevents infinite micro-movements
         snapToZero(this.velocity, this.VELOCITY_THRESHOLD);
 
-        // Knoickback decay
+        // Knockback decay
         if (Math.abs(this.externalForce.x) > 0 || Math.abs(this.externalForce.y) > 0) {
             this.externalForce.x *= 1 - (this.friction * dt);
             this.externalForce.y *= 1 - (this.friction * dt);
@@ -92,6 +95,42 @@ export class Player extends Entity {
         }
     }
 
+    public performAttack(enemies: Entity[]): void {
+        if (!this.input.isAttacking || this.isAttacking) return;
+
+        this.isAttacking = true;
+        this.playAnimation('hit', false);
+
+        const mag = Math.sqrt(this.velocity.x ** 2 + this.velocity.y ** 2) || 1;
+        const dirX = this.velocity.x / mag;
+        const dirY = this.velocity.y / mag;
+
+        const attackX = this.x + (dirX * this.ATK_OFFSET);
+        const attackY = this.y + (dirY * this.ATK_OFFSET);
+
+        const attackCircle = {
+            x: attackX,
+            y: attackY,
+            radius: this.ATK_RADIUS
+        };
+
+        enemies.forEach(enemy => {
+            if (Collision.checkCircle(attackCircle, enemy.getCollisionCircle())) {
+                enemy.takeDamage(this.stats['atk'], this);
+                console.log(enemy.stats['hp']);
+            }
+        });
+
+        this.debugGraphic.clear();
+        this.debugGraphic.setStrokeStyle({ width: 2, color: 0x00ff00 })
+            .circle(dirX * this.ATK_OFFSET, dirY * this.ATK_OFFSET, this.ATK_RADIUS).stroke();
+
+        this.sprite.onComplete = () => {
+            this.isAttacking = false;
+            this.playAnimation('idle');
+        };
+    }
+
     public getPlayerSummary() {
         return `
             (location) x: ${this.x.toFixed(2)} | y: ${this.y.toFixed(2)}<br>
@@ -104,14 +143,5 @@ export class Player extends Entity {
             friction: ${this.friction}<br>
             (force) x: ${this.externalForce.x.toFixed(2)} | y: ${this.externalForce.y.toFixed(2)}<br>
         `;
-    }
-
-    private attack() {
-        this.playAnimation('hit', false);
-
-        this.sprite.onComplete = () => {
-            this.isAttacking = false;
-            this.playAnimation('idle');
-        };
     }
 }

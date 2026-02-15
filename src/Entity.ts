@@ -78,6 +78,7 @@ export class Entity extends Container {
         this.debugGraphic
             .roundRect(-width / 2, -height / 2, width, height, cornerRadius)
             .fill({ color, alpha: 0.5 });
+        this.drawCollisionCircle();
     }
 
     /**
@@ -91,6 +92,18 @@ export class Entity extends Container {
             width: this.hitBox.width,
             height: this.hitBox.height
         };
+    }
+
+    /**
+     * Draw collision circle of entity
+     * @param color - The hex color used to fill the debug circle.
+     */
+    public drawCollisionCircle(color: number = 0x00ff00): void {
+        const cx = this.sprite.x;
+        const cy = this.sprite.y;
+        const rad = this.getCollisionCircle().radius;
+        this.debugGraphic.setStrokeStyle({ width: 2, color: color })
+            .circle(cx, cy, rad).stroke();
     }
 
     /**

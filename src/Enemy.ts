@@ -1,9 +1,10 @@
 import { Entity } from "./Entity";
 import type { Player } from "./Player";
+import { snapToZero } from "./math";
 
 export class Enemy extends Entity {
     private target: Player | null = null;
-    private chaseRange: number = 500;
+    private chaseRange: number = 300;
     private velocity = { x: 0, y: 0 };
 
     constructor(animations: any, stats: any, target: Player) {
@@ -42,8 +43,16 @@ export class Enemy extends Entity {
         if (Math.abs(this.velocity.x) < 0.01) this.velocity.x = 0;
         if (Math.abs(this.velocity.y) < 0.01) this.velocity.y = 0;
 
-        // Update location
-        this.x += this.velocity.x * dt;
-        this.y += this.velocity.y * dt;
+        // Knockback decay
+        if (Math.abs(this.externalForce.x) > 0 || Math.abs(this.externalForce.y) > 0) {
+            this.externalForce.x *= 1 - (this.friction * dt);
+            this.externalForce.y *= 1 - (this.friction * dt);
+
+            snapToZero(this.externalForce, 0.2);
+        }
+
+        // Final position update
+        this.x += (this.velocity.x + this.externalForce.x) * dt;
+        this.y += (this.velocity.y + this.externalForce.y) * dt;
     }
 }

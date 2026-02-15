@@ -85,6 +85,8 @@ async function init() {
 
         hero.update(time.deltaTime);
 
+        hero.performAttack(enemies);
+
         enemies.forEach(enemy => {
             enemy.update(time.deltaTime);
 
