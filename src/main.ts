@@ -1,6 +1,5 @@
 import { Application, Assets, Container, TextureSource } from "pixi.js";
 import { DungeonMap } from "./Map";
-import type { IEntityStats } from "./types";
 import { Player } from "./Player";
 import { Enemy } from "./Enemy";
 import { Collision } from "./Collision";
@@ -41,22 +40,24 @@ async function init() {
     // Create the map
     const dungeon = new DungeonMap(groundSheet, 1, 4, 12, 9);
 
-    const heroStats: IEntityStats = {
+    const heroStats = {
         hp: 200,
         maxHp: 200,
         atk: 25,
         speed: 30,
         acceleration: 2.5,
-        deceleration: 4
+        deceleration: 4,
+        damageCooldown: 60
     };
 
-    const slimeStats: IEntityStats = {
+    const slimeStats = {
         hp: 300,
         maxHp: 300,
         atk: 20,
         speed: 25,
         acceleration: 0,
-        deceleration: 0
+        deceleration: 0,
+        damageCooldown: 40
     };
 
     const hero = new Player(playerSheet.animations, heroStats);
@@ -78,7 +79,6 @@ async function init() {
     }
 
     // Update the game
-    // app.ticker.maxFPS = 60;
     app.ticker.add((time) => {
         if (app.screen.width === 0 || !hero) return;
         world.children.sort((a, b) => a.y - b.y);
@@ -88,6 +88,7 @@ async function init() {
         hero.performAttack(enemies);
 
         enemies.forEach(enemy => {
+            if (enemy.stats.hp <= 0) return;
             enemy.update(time.deltaTime);
 
             if (Collision.checkCircle(hero.getCollisionCircle(), enemy.getCollisionCircle())) {
@@ -105,7 +106,9 @@ async function init() {
 
         // Update debug hud contents
         if (debugHud && !hero.isDestroyed) {
-            debugHud.innerHTML = hero.getPlayerSummary();
+            debugHud.innerHTML = `
+            ${hero.getPlayerSummary()}
+            `;
         }
     });
 }

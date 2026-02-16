@@ -1,19 +1,21 @@
 import { Entity } from "./Entity";
 import type { Player } from "./Player";
 import { snapToZero } from "./math";
+import type { IEntityStats } from "./types";
 
 export class Enemy extends Entity {
     private target: Player | null = null;
     private chaseRange: number = 300;
     private velocity = { x: 0, y: 0 };
 
-    constructor(animations: any, stats: any, target: Player) {
+    constructor(animations: any, stats: Partial<IEntityStats>, target: Player) {
         super(animations, stats);
         this.target = target;
     }
 
     public update(deltaTime: number) {
-        this.drawHitbox(0xff0000);
+        super.update(deltaTime)
+        if (this.isDestroyed) return;
         const dt = Math.min(deltaTime, 0.1);
         if (!this.target || this.target.isDestroyed) return;
 

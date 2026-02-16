@@ -37,6 +37,10 @@ export interface IEntityStats {
     acceleration: number;
     /** Speed decrease until reaches 0. */
     deceleration: number;
+    /** 0 (flies away) to 1 (immovable) */
+    weight: number;
+    /** Individual cooldown reductions */
+    damageCooldown: number;
 }
 
 /**

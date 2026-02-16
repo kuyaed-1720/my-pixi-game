@@ -16,8 +16,9 @@ export class Player extends Entity {
     private readonly ATK_RADIUS: number = 48;
     private readonly ATK_OFFSET: number = 80;
     private readonly VELOCITY_THRESHOLD: number = 0.1;
+    private hitEnemies: Set<Entity> = new Set();
 
-    constructor(animations: AnimationMap, stats: IEntityStats) {
+    constructor(animations: AnimationMap, stats: Partial<IEntityStats>) {
         super(animations, stats);
         this.input = new InputManager();
     }
@@ -96,6 +97,7 @@ export class Player extends Entity {
     }
 
     public performAttack(enemies: Entity[]): void {
+        if (!this.isAttacking) this.hitEnemies.clear();
         if (!this.input.isAttacking || this.isAttacking) return;
 
         this.isAttacking = true;
@@ -115,9 +117,9 @@ export class Player extends Entity {
         };
 
         enemies.forEach(enemy => {
-            if (Collision.checkCircle(attackCircle, enemy.getCollisionCircle())) {
+            if (!this.hitEnemies.has(enemy) && Collision.checkCircle(attackCircle, enemy.getCollisionCircle())) {
                 enemy.takeDamage(this.stats['atk'], this);
-                console.log(enemy.stats['hp']);
+                this.hitEnemies.add(enemy);
             }
         });
 
@@ -139,7 +141,6 @@ export class Player extends Entity {
             state: ${this.state}<br>
             isAttacking: ${this.isAttacking}<br>
             health: ${this.stats['hp']}<br>
-            cooldown: ${this.damageCooldown.toFixed(2)}<br>
             friction: ${this.friction}<br>
             (force) x: ${this.externalForce.x.toFixed(2)} | y: ${this.externalForce.y.toFixed(2)}<br>
         `;

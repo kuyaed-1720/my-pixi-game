@@ -10,13 +10,13 @@ export type AnimationMap = { [key: string]: Texture[] };
 export class Entity extends Container {
     public isAttacking: boolean = false;
     public isDestroyed: boolean = false;
-    public damageCooldown: number = 0;
+    private damageCooldown: number = 0;
     public state: string = 'idle';
 
     public sprite: AnimatedSprite;
     public stats: IEntityStats;
 
-    private readonly IFRAME_DURATION: number = 60;
+    // private readonly IFRAME_DURATION: number = 60;
     private readonly SPRITE_SCALE: number = 4;
 
     protected debugGraphic: Graphics;
@@ -25,10 +25,21 @@ export class Entity extends Container {
     protected externalForce: IVector2D = { x: 0, y: 0 };
     protected friction: number = 1.5
 
-    constructor(animations: AnimationMap, stats: IEntityStats) {
+    constructor(animations: AnimationMap, stats: Partial<IEntityStats>) {
         super();
         this.animations = animations;
-        this.stats = stats;
+        const defaultStats = {
+            hp: 100,
+            maxHp: 100,
+            atk: 10,
+            speed: 10,
+            acceleration: 0,
+            deceleration: 0,
+            weight: 0.2,
+            damageCooldown: 0.2
+        };
+
+        this.stats = { ...defaultStats, ...stats };
 
         this.debugGraphic = new Graphics();
         this.sprite = new AnimatedSprite(this.animations['idle']);
@@ -50,6 +61,7 @@ export class Entity extends Container {
      * @param dt - The delta time from the game ticker.
      */
     public update(dt: number): void {
+        if (this.isDestroyed) return;
         if (this.damageCooldown > 0) {
             this.damageCooldown -= dt;
 
@@ -59,8 +71,8 @@ export class Entity extends Container {
             }
         }
 
-        if (this.debugGraphic.visible) {
-            this.drawHitbox();
+        if (this.debugGraphic.visible && !this.isDestroyed) {
+            this.drawCollisionCircle();
         }
     }
 
@@ -143,7 +155,7 @@ export class Entity extends Container {
         if (this.damageCooldown > 0 || this.isDestroyed) return;
 
         this.stats['hp'] -= amount;
-        this.damageCooldown = this.IFRAME_DURATION;
+        this.damageCooldown = this.stats.damageCooldown;
         this.sprite.tint = 0xff0000;
 
         if (source) {
