@@ -1,10 +1,11 @@
 import { Application, Assets, Container, TextureSource } from "pixi.js";
 import { DungeonMap } from "./Map";
+import { Entity } from "./Entity";
 import { Player } from "./Player";
 import { Enemy } from "./Enemy";
 import { Collision } from "./Collision";
 
-const enemies: Enemy[] = [];
+const enemies: Entity[] = [];
 
 async function init() {
     // Get the game container
@@ -86,6 +87,14 @@ async function init() {
         hero.update(time.deltaTime);
 
         hero.performAttack(enemies);
+
+        while (Entity.deadQueue.length > 0) {
+            const corpse = Entity.deadQueue.pop();
+            const index = enemies.indexOf(corpse!);
+            if (index > -1) {
+                enemies.splice(index, 1);
+            }
+        }
 
         enemies.forEach(enemy => {
             if (enemy.stats.hp <= 0) return;

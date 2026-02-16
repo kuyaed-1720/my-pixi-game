@@ -9,7 +9,7 @@ export class Enemy extends Entity {
     private velocity = { x: 0, y: 0 };
 
     constructor(animations: any, stats: Partial<IEntityStats>, target: Player) {
-        super(animations, stats);
+        super('enemy', animations, stats);
         this.target = target;
     }
 

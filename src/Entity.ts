@@ -1,5 +1,5 @@
 import { AnimatedSprite, Container, Graphics, Texture } from "pixi.js";
-import type { ICircle, IEntityStats, IRectangle, IVector2D } from "./types";
+import type { ICircle, IEntityStats, IRectangle, IVector2D, EntityType } from "./types";
 
 export type AnimationMap = { [key: string]: Texture[] };
 
@@ -8,6 +8,8 @@ export type AnimationMap = { [key: string]: Texture[] };
  * Handles hitboxes, health, and damage cooldowns.
  */
 export class Entity extends Container {
+    public static deadQueue: Entity[] = [];
+    public entityType: EntityType;
     public isAttacking: boolean = false;
     public isDestroyed: boolean = false;
     private damageCooldown: number = 0;
@@ -25,8 +27,9 @@ export class Entity extends Container {
     protected externalForce: IVector2D = { x: 0, y: 0 };
     protected friction: number = 1.5
 
-    constructor(animations: AnimationMap, stats: Partial<IEntityStats>) {
+    constructor(type: EntityType, animations: AnimationMap, stats: Partial<IEntityStats>) {
         super();
+        this.entityType = type;
         this.animations = animations;
         const defaultStats = {
             hp: 100,
@@ -74,23 +77,6 @@ export class Entity extends Container {
         if (this.debugGraphic.visible && !this.isDestroyed) {
             this.drawCollisionCircle();
         }
-    }
-
-    /**
-     * Draws hitbox of entity base on the size and scale of sprite.
-     * @param color - The hex color used to fill the debug rectangle.
-     */
-    public drawHitbox(color: number = 0xff0000): void {
-        this.debugGraphic.clear();
-
-        const width = this.hitBox.width;
-        const height = this.hitBox.height;
-        const cornerRadius = Math.min(width, height) / 2;
-
-        this.debugGraphic
-            .roundRect(-width / 2, -height / 2, width, height, cornerRadius)
-            .fill({ color, alpha: 0.5 });
-        this.drawCollisionCircle();
     }
 
     /**
@@ -170,7 +156,7 @@ export class Entity extends Container {
             this.externalForce.y = (dy / dist) * powerScaling;
         }
 
-        if (this.stats['hp'] <= 0) this.onDeath();
+        if (this.stats.hp <= 0) this.onDeath();
     }
 
     /**
@@ -179,8 +165,9 @@ export class Entity extends Container {
      */
     public onDeath(): void {
         this.isDestroyed = true;
-        setTimeout(() => {
-            this.sprite.destroy();
-        }, 100);
+        if (this.entityType === 'enemy') {
+            Entity.deadQueue.push(this);
+        }
+        this.destroy({ children: true, texture: false });
     }
 }

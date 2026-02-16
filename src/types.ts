@@ -21,6 +21,8 @@ export interface ICircle {
     radius: number;
 }
 
+export type EntityType = 'player' | 'enemy';
+
 /**
  * Core attributes for any living entity in the game.
  */

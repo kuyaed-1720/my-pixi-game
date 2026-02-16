@@ -19,7 +19,7 @@ export class Player extends Entity {
     private hitEnemies: Set<Entity> = new Set();
 
     constructor(animations: AnimationMap, stats: Partial<IEntityStats>) {
-        super(animations, stats);
+        super('player', animations, stats);
         this.input = new InputManager();
     }
 
