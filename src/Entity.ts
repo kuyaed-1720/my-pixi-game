@@ -65,6 +65,7 @@ export class Entity extends Container {
      */
     public update(dt: number): void {
         if (this.isDestroyed) return;
+        this.zIndex = this.y;
         if (this.damageCooldown > 0) {
             this.damageCooldown -= dt;
 
@@ -74,9 +75,9 @@ export class Entity extends Container {
             }
         }
 
-        if (this.debugGraphic.visible && !this.isDestroyed) {
-            this.drawCollisionCircle();
-        }
+        // if (this.debugGraphic.visible && !this.isDestroyed) {
+        //     this.drawCollisionCircle();
+        // }
     }
 
     /**

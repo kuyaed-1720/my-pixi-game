@@ -65,6 +65,7 @@ async function init() {
 
     // Add to canvas
     const world = new Container();
+    world.sortableChildren = true;
     app.stage.addChild(world);
     world.addChild(dungeon.container);
     world.addChild(hero);
@@ -82,7 +83,6 @@ async function init() {
     // Update the game
     app.ticker.add((time) => {
         if (app.screen.width === 0 || !hero) return;
-        world.children.sort((a, b) => a.y - b.y);
 
         hero.update(time.deltaTime);
 

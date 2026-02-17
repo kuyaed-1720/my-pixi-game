@@ -123,9 +123,9 @@ export class Player extends Entity {
             }
         });
 
-        this.debugGraphic.clear();
-        this.debugGraphic.setStrokeStyle({ width: 2, color: 0x00ff00 })
-            .circle(dirX * this.ATK_OFFSET, dirY * this.ATK_OFFSET, this.ATK_RADIUS).stroke();
+        // this.debugGraphic.clear();
+        // this.debugGraphic.setStrokeStyle({ width: 2, color: 0x00ff00 })
+        //     .circle(dirX * this.ATK_OFFSET, dirY * this.ATK_OFFSET, this.ATK_RADIUS).stroke();
 
         this.sprite.onComplete = () => {
             this.isAttacking = false;
