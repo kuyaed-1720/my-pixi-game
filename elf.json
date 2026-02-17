@@ -1,0 +1,72 @@
+{
+    "frames": {
+        "idle_0": {
+            "frame": { "x": 0, "y": 0, "w": 16, "h": 16 },
+            "sourceSize": { "w": 16, "h": 16 }
+        },
+        "idle_1": {
+            "frame": { "x": 16, "y": 0, "w": 16, "h": 16 },
+            "sourceSize": { "w": 16, "h": 16 }
+        },
+        "idle_2": {
+            "frame": { "x": 32, "y": 0, "w": 16, "h": 16 },
+            "sourceSize": { "w": 16, "h": 16 }
+        },
+        "walk_0": {
+            "frame": { "x": 0, "y": 32, "w": 16, "h": 16 },
+            "sourceSize": { "w": 16, "h": 16 }
+        },
+        "walk_1": {
+            "frame": { "x": 16, "y": 32, "w": 16, "h": 16 },
+            "sourceSize": { "w": 16, "h": 16 }
+        },
+        "walk_2": {
+            "frame": { "x": 32, "y": 32, "w": 16, "h": 16 },
+            "sourceSize": { "w": 16, "h": 16 }
+        },
+        "walk_3": {
+            "frame": { "x": 48, "y": 32, "w": 16, "h": 16 },
+            "sourceSize": { "w": 16, "h": 16 }
+        },
+        "hit_0": {
+            "frame": { "x": 0, "y": 64, "w": 16, "h": 16 },
+            "sourceSize": { "w": 16, "h": 16 }
+        },
+        "hit_1": {
+            "frame": { "x": 16, "y": 64, "w": 16, "h": 16 },
+            "sourceSize": { "w": 16, "h": 16 }
+        },
+        "hit_2": {
+            "frame": { "x": 32, "y": 64, "w": 16, "h": 16 },
+            "sourceSize": { "w": 16, "h": 16 }
+        },
+        "hit_3": {
+            "frame": { "x": 48, "y": 64, "w": 16, "h": 16 },
+            "sourceSize": { "w": 16, "h": 16 }
+        },
+        "die_0": {
+            "frame": { "x": 0, "y": 96, "w": 16, "h": 16 },
+            "sourceSize": { "w": 16, "h": 16 }
+        },
+        "die_1": {
+            "frame": { "x": 16, "y": 96, "w": 16, "h": 16 },
+            "sourceSize": { "w": 16, "h": 16 }
+        },
+        "die_2": {
+            "frame": { "x": 32, "y": 96, "w": 16, "h": 16 },
+            "sourceSize": { "w": 16, "h": 16 }
+        }
+    },
+    "meta": {
+        "image": "elf.png",
+        "format": "RGBA8888",
+        "size": { "x": 112, "y": 144 },
+        "scale": 1
+    },
+    "animations" : {
+        "idle": ["idle_0", "idle_1", "idle_2"],
+        "walk": ["walk_0", "walk_1", "walk_2", "walk_3"],
+        "hit": ["hit_1", "hit_2", "hit_3"],
+        "die": ["die_0", "die_1", "die_2"]
+    }
+}
