@@ -31,6 +31,12 @@ export class TouchControls extends Container {
         window.addEventListener('pointermove', (e) => this.handleMove(e));
     }
 
+    public onResize(width: number, height: number) {
+        const margin = width < 500 ? 60 : 100;
+        this.joystick.x = margin;
+        this.joystick.y = height - margin;
+    }
+
     private handleMove(e: PointerEvent) {
         if (!this.isDragging) return;
 

@@ -27,6 +27,19 @@ async function init() {
     TextureSource.defaultOptions.scaleMode = "nearest";
     app.stage.scale.set(1);
 
+    const resizeObserver = new ResizeObserver((entries) => {
+        for (let entry of entries) {
+            const { width, height } = entry.contentRect;
+            app.renderer.resize(width, height);
+
+            hero.onResize(width, height);
+
+            world.x = width / 2;
+            world.y = height / 2;
+        }
+    });
+
+
     // Add the application to the game container
     container.appendChild(app.canvas);
 
@@ -68,6 +81,7 @@ async function init() {
     world.addChild(dungeon.container);
     world.addChild(hero);
 
+    resizeObserver.observe(container);
     const slimeCount = 4;
     for (let i = 0; i < slimeCount; i++) {
         const slime = new Enemy(slimeSheet.animations, slimeStats, hero);

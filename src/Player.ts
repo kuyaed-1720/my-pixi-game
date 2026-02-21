@@ -33,6 +33,10 @@ export class Player extends Entity {
         this.applyMovementPhysics(dt);
     }
 
+    public onResize(width: number, height: number) {
+        this.input.resizeTouchControls(width, height);
+    }
+
     public handleAttack(enemies: Entity[]) {
         if (this.input.isAttacking && !this.isAttacking) {
             this.performAttack(enemies);

@@ -35,6 +35,10 @@ export class InputManager {
         return { x: fx, y: fy };
     }
 
+    public resizeTouchControls(width: number, height: number) {
+        this.touch.onResize(width, height);
+    }
+
     /** Returns true if either Shift key is currently pressed. */
     public get isSprinting(): boolean {
         return !!(this.keys['Shiftleft'] || this.keys['ShiftRight']);
