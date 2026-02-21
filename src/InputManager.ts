@@ -1,3 +1,5 @@
+import type { Application } from "pixi.js";
+import { TouchControls } from "./TouchControls";
 import type { IVector2D } from "./types";
 
 /**
@@ -5,10 +7,13 @@ import type { IVector2D } from "./types";
  */
 export class InputManager {
     private keys: Record<string, boolean> = {};
+    private touch: TouchControls;
 
-    constructor() {
+    constructor(app: Application) {
         window.addEventListener("keydown", (e) => this.keys[e.code] = true);
         window.addEventListener("keyup", (e) => this.keys[e.code] = false);
+
+        this.touch = new TouchControls(app);
     }
 
     /**
@@ -16,11 +21,18 @@ export class InputManager {
      * @returns {IVector2D} A vector where values range from -1 to 1.
      */
     public get direction(): IVector2D {
-        const x = Number(this.keys['ArrowRight'] || this.keys['KeyD'] || 0)
+        const kx = Number(this.keys['ArrowRight'] || this.keys['KeyD'] || 0)
             - Number(this.keys['ArrowLeft'] || this.keys['KeyA'] || 0);
-        const y = Number(this.keys['ArrowDown'] || this.keys['KeyS'] || 0)
+        const ky = Number(this.keys['ArrowDown'] || this.keys['KeyS'] || 0)
             - Number(this.keys['ArrowUp'] || this.keys['KeyW'] || 0);
-        return { x, y };
+
+        const tx = this.touch.direction.x;
+        const ty = this.touch.direction.y;
+
+        const fx = Math.max(-1, Math.min(1, kx + tx));
+        const fy = Math.max(-1, Math.min(1, ky + ty));
+
+        return { x: fx, y: fy };
     }
 
     /** Returns true if either Shift key is currently pressed. */

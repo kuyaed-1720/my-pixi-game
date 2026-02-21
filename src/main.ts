@@ -58,7 +58,7 @@ async function init() {
         damageCooldown: 4
     };
 
-    const hero = new Player(playerSheet.animations, heroStats);
+    const hero = new Player(playerSheet.animations, heroStats, app);
 
 
     // Add to canvas

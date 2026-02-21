@@ -3,6 +3,7 @@ import { Collision } from "./Collision";
 import { InputManager } from "./InputManager";
 import { snapToZero } from "./math";
 import type { IEntityStats, IVector2D } from "./types";
+import type { Application } from "pixi.js";
 
 /**
  * The main player-controlled character.
@@ -18,9 +19,9 @@ export class Player extends Entity {
     private readonly VELOCITY_THRESHOLD: number = 0.1;
     private hitEnemies: Set<Entity> = new Set();
 
-    constructor(animations: AnimationMap, stats: Partial<IEntityStats>) {
+    constructor(animations: AnimationMap, stats: Partial<IEntityStats>, app: Application) {
         super('player', animations, stats);
-        this.input = new InputManager();
+        this.input = new InputManager(app);
     }
 
     /**
