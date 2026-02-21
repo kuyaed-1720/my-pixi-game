@@ -15,10 +15,6 @@ async function init() {
         return;
     }
 
-    // For live information while in debug mode
-    const debugHud = document.getElementById('debug-hud');
-    const enemyHud = document.getElementById('enemy-hud');
-
     // Initialize app
     const app = new Application();
     await app.init({
@@ -64,6 +60,7 @@ async function init() {
 
     const hero = new Player(playerSheet.animations, heroStats);
 
+
     // Add to canvas
     const world = new Container();
     world.sortableChildren = true;
@@ -76,12 +73,6 @@ async function init() {
         const slime = new Enemy(slimeSheet.animations, slimeStats, hero);
         slime.x = 200 + (1 * 100);
         slime.y = 200 + (i * 100);
-
-        const p = document.createElement('p');
-        p.id = `enemy${i}`;
-        slime.stats.id = i;
-        p.innerHTML = ``;
-        if (enemyHud) enemyHud.appendChild(p);
 
         enemies.push(slime);
         world.addChild(slime);
@@ -107,17 +98,6 @@ async function init() {
             }
         }
 
-        enemies.forEach(enemy => {
-            if (enemy.stats.hp <= 0) return;
-            enemy.update(dt);
-
-            if (hero && !hero.isDestroyed) {
-            if (Collision.checkCircle(hero.getCollisionCircle(), enemy.getCollisionCircle())) {
-                hero.takeDamage(enemy.stats.atk, enemy);
-            }
-            }
-        });
-
         if (hero && !hero.isDestroyed) {
             const targetX = (app.screen.width / 2) - hero.x;
             const targetY = (app.screen.height / 2) - hero.y;
@@ -128,21 +108,16 @@ async function init() {
             }
         }
 
-        // Update debug hud contents
-        if (debugHud && !hero.isDestroyed) {
-            debugHud.innerHTML = `
-            ${hero.getPlayerSummary()}
-            `;
-            enemies.forEach(enemy => {
-                const distanceX = hero.x - enemy.x;
-                const distanceY = hero.y - enemy.y;
-                const distance = Math.sqrt(distanceX ** 2 + distanceY ** 2);
+        enemies.forEach(enemy => {
+            if (enemy.stats.hp <= 0) return;
+            enemy.update(dt);
 
-                if (enemyHud && enemy.getStats() >= distance) {
-                    enemyHud.innerHTML = `${enemy.getEnemySummary()}`;
+            if (hero && !hero.isDestroyed) {
+                if (Collision.checkCircle(hero.getCollisionCircle(), enemy.getCollisionCircle())) {
+                    hero.takeDamage(enemy.stats.atk, enemy);
                 }
-            });
-        }
+            }
+        });
     });
 }
 

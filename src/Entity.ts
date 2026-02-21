@@ -1,4 +1,4 @@
-import { AnimatedSprite, Container, Graphics, Texture } from "pixi.js";
+import { AnimatedSprite, Container, Graphics, Texture, Text, TextStyle, Ticker } from "pixi.js";
 import type { ICircle, IEntityStats, IRectangle, IVector2D, EntityType } from "./types";
 
 export type AnimationMap = { [key: string]: Texture[] };
@@ -18,8 +18,21 @@ export class Entity extends Container {
     public sprite: AnimatedSprite;
     public stats: IEntityStats;
 
-    // private readonly IFRAME_DURATION: number = 60;
     private readonly SPRITE_SCALE: number = 4;
+    private static damageStyle = new TextStyle({
+        fontFamily: 'Arial',
+        fontSize: 20,
+        fill: '#cd201d',
+        stroke: { color: '#000000', width: 1 },
+        fontWeight: 'bold',
+    });
+    private static playerStyle = new TextStyle({
+        fontFamily: 'Arial',
+        fontSize: 20,
+        fill: '#ffe523',
+        stroke: { color: '#000000', width: 1 },
+        fontWeight: 'bold',
+    });
 
     protected debugGraphic: Graphics;
     protected animations: AnimationMap;
@@ -164,9 +177,62 @@ export class Entity extends Container {
 
             this.externalForce.x = (dx / dist) * powerScaling;
             this.externalForce.y = (dy / dist) * powerScaling;
+
+            this.showDamage(source, amount);
         }
 
         if (this.stats.hp <= 0) this.onDeath();
+    }
+
+    /**
+     * Creates a floating damage number that cleans itself up.
+     */
+    public showDamage(source: Entity, amount: number) {
+        let pop = new Text({
+            text: amount.toString(),
+            style: Entity.damageStyle
+        });
+
+        if (this.entityType === 'player') {
+            pop = new Text({
+                text: amount.toString(),
+                style: Entity.playerStyle
+            });
+        }
+
+        const dx = this.x - source.x;
+        const dy = this.y - source.y;
+        const dist = Math.sqrt(dx ** 2 + dy ** 2);
+
+        const dirX = dx / dist;
+        const dirY = dy / dist;
+
+        pop.x = this.x;
+        pop.y = this.y - 32;
+
+        if (this.parent) {
+            this.parent.addChild(pop);
+        }
+
+        let elapsed = 0;
+        const duration = 90;
+        const force = 3;
+
+        const ticker = (delta: Ticker) => {
+            pop.x += dirX * force * delta.deltaTime;
+            pop.y += dirY * force * delta.deltaTime;
+            pop.y += 0.5 * delta.deltaTime;
+            pop.alpha -= 0.01 * delta.deltaTime;
+
+            elapsed += delta.deltaTime;
+
+            if (pop.alpha <= 0 || elapsed >= duration) {
+                Ticker.shared.remove(ticker);
+                pop.destroy();
+            }
+        };
+
+        Ticker.shared.add(ticker);
     }
 
     /**

@@ -23,31 +23,31 @@
     <div id="pixi-content">
     <div id="debug-hud" style="
                 position: absolute;
-                top: 10px;
-                left: 10px;
-                background: rgba(0, 0, 0, 0.7);
+                top: 0;
+                left: 0;
+                width: 200px;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
                 color: #00ff00;
                 padding: 10px;
                 font-family: monospace;
-                pointer-events: none;
                 z-index: 100;
-                border: 1px solid 300ff00;
+                display: none;
             ">
-    </div>
-    <div id="enemy-hud" style="
-              position: absolute;
-              top: 10px;
-              right: 10px;
-              background: rgba(0, 0, 0, 0.7);
-              color: #00ff00;
-              padding: 10px;
-              font-family: monospace;
-              pointer-events: none;
-              z-index: 100;
-              border: 1px solid 300ff00;
-            ">
+            <h3>Rntity Stats</h3>
+            <div id="stats-content"></div>
+            <button onclick="closeSidebar()">Close</button>
     </div>
     </div>
     <script type="module" src="src/main.ts"></script>
+    <script>
+        function closeSidebar() {
+            const sidebar = document.getElementById('debug-hud');
+            if (sidebar) {
+                sidebar.style.display = 'none';
+            }
+            selectedEntity = null;
+        }
+    </script>
   </body>
 </html>
