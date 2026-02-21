@@ -62,7 +62,7 @@ async function init() {
     };
 
     const slimeStats = {
-        hp: 500,
+        hp: 400,
         maxHp: 500,
         atk: 20,
         speed: 25,
@@ -108,6 +108,14 @@ async function init() {
                 const index = enemies.indexOf(enemyCorpse!);
                 if (index > -1) {
                     enemies.splice(index, 1);
+                    if (enemies.length === 0) {
+                        const gameOverDiv = document.getElementById('game-over-overlay');
+                        const result = document.getElementById('result');
+                        if (gameOverDiv) {
+                            gameOverDiv.style.display = 'flex';
+                            result!.innerText = 'YOU WIN';
+                        }
+                    }
                 }
             }
         }

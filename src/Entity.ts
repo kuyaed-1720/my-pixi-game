@@ -243,6 +243,13 @@ export class Entity extends Container {
         this.isDestroyed = true;
         if (this.entityType === 'enemy') {
             Entity.deadQueue.push(this);
+            this.destroy({ children: true, texture: false });
+            return;
+        }
+        Ticker.shared.stop();
+        const gameOverDiv = document.getElementById('game-over-overlay');
+        if (gameOverDiv) {
+            gameOverDiv.style.display = 'flex';
         }
         this.destroy({ children: true, texture: false });
     }

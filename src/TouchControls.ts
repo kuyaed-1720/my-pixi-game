@@ -4,6 +4,7 @@ export class TouchControls extends Container {
     public direction = { x: 0, y: 0 };
     private joystick: Graphics;
     private knob: Graphics;
+    // private attack: Graphics;
     private isDragging: boolean = false;
 
     constructor(app: Application) {

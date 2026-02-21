@@ -17,37 +17,45 @@
         height: 100vh;
         object-fit: contain;
       }
+      #game-over-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width:100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        font-family: 'Arial', sans-serif;
+        z-index: 100;
+      }
+      .content {
+        text-align: center;
+      }
+      h1 {
+        font-size: 3rem;
+        margin-bottom: 20px;
+        color: #ff4444;
+      }
+      button {
+        padding: 10px 20px;
+        font-size: 1.2rem;
+        cursor: pointer;
+      }
     </style>
-  </head>
-  <body>
-    <div id="pixi-content">
-    <div id="debug-hud" style="
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 200px;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.8);
-                color: #00ff00;
-                padding: 10px;
-                font-family: monospace;
-                z-index: 100;
-                display: none;
-            ">
-            <h3>Rntity Stats</h3>
-            <div id="stats-content"></div>
-            <button onclick="closeSidebar()">Close</button>
-    </div>
+    </head>
+    
+    <body>
+        <div id="pixi-content">
+            <div id="game-over-overlay" style="display: none;">
+                <div class="content">
+                    <h1 id="result">GAME OVER</h1>
+                    <button onclick="location.reload()">Try Again</button>
+                </div>
+            </div>
     </div>
     <script type="module" src="src/main.ts"></script>
-    <script>
-        function closeSidebar() {
-            const sidebar = document.getElementById('debug-hud');
-            if (sidebar) {
-                sidebar.style.display = 'none';
-            }
-            selectedEntity = null;
-        }
-    </script>
   </body>
 </html>
