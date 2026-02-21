@@ -46,6 +46,6 @@ export class InputManager {
 
     /** Retruns true if Space or the 'K/J' keys are pressed for attacking. */
     public get isAttacking(): boolean {
-        return !!(this.keys['Space'] || this.keys['KeyK'] || this.keys['KeyJ']);
+        return !!(this.keys['Space'] || this.keys['KeyK'] || this.keys['KeyJ'] || this.touch.isAttacking);
     }
 }
