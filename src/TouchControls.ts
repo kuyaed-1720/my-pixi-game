@@ -71,7 +71,7 @@ export class TouchControls extends Container {
         const margin = width < 500 ? 75 : 100;
         this.joystick.x = margin;
         this.joystick.y = height - margin;
-        this.attackBtn.position.set(this.joystick.x + margin * 2, height + margin * 2);
+        this.attackBtn.position.set(this.joystick.x + margin * 2, height + margin);
     }
 
     private handleMove(e: FederatedPointerEvent) {
