@@ -211,6 +211,7 @@ export class Entity extends Container {
         pop.y = this.y - 32;
 
         if (this.parent) {
+            pop.zIndex = 8;
             this.parent.addChild(pop);
         }
 

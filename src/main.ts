@@ -77,8 +77,11 @@ async function init() {
     // Add to canvas
     const world = new Container();
     world.sortableChildren = true;
+    world.zIndex = 1;
+    dungeon.container.zIndex = 2;
     app.stage.addChild(world);
     world.addChild(dungeon.container);
+    hero.zIndex = 10;
     world.addChild(hero);
 
     resizeObserver.observe(container);
@@ -87,7 +90,7 @@ async function init() {
         const slime = new Enemy(slimeSheet.animations, slimeStats, hero);
         slime.x = 200 + (1 * 100);
         slime.y = 200 + (i * 100);
-
+        slime.zIndex = 10;
         enemies.push(slime);
         world.addChild(slime);
     }

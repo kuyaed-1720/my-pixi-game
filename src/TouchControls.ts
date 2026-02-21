@@ -1,4 +1,4 @@
-import { Application, Container, Graphics } from "pixi.js";
+import { Application, Container, FederatedPointerEvent, Graphics } from "pixi.js";
 
 export class TouchControls extends Container {
     public direction = { x: 0, y: 0 };
@@ -14,10 +14,11 @@ export class TouchControls extends Container {
         // base
         this.joystick = new Graphics();
         this.joystick.zIndex = 1000;
+        this.joystick.fill({ color: 0xffffff, alpha: 0.2 });
         this.joystick.setStrokeStyle({
             color: 0xffffff,
-            alpha: 0.2
-        }).circle(0, 0, 60).stroke();
+            alpha: 0.5
+        }).circle(0, 0, 60).fill().stroke();
         this.joystick.position.set(100, screenHeight - 100);
         // knob
         this.knob = new Graphics();
@@ -30,11 +31,12 @@ export class TouchControls extends Container {
 
         this.attackBtn = new Graphics();
         this.attackBtn.zIndex = 999;
+        this.attackBtn.fill({ color: 0xff4444, alpha: 0.5 });
         this.attackBtn.setStrokeStyle({
             color: 0xff4444,
             alpha: 0.5
-        }).circle(0, 0, 40).stroke();
-        this.attackBtn.position.set(app.screen.width - 100, app.screen.height - 100);
+        }).circle(0, 0, 40).fill().stroke();
+        this.attackBtn.position.set(app.screen.width - 100, screenHeight - 100);
         this.attackBtn.eventMode = 'static';
         this.attackBtn.on('pointerdown', () => {
             this.isAttacking = true;
@@ -51,23 +53,32 @@ export class TouchControls extends Container {
         app.stage.addChild(this.attackBtn);
 
         this.joystick.eventMode = 'static';
-        this.joystick.on('pointerdown', () => this.isDragging = true);
-        window.addEventListener('pointerup', () => this.handleUp());
-        window.addEventListener('pointermove', (e) => this.handleMove(e));
+        this.joystick.on('pointerdown', () => { this.isDragging = true; this.joystick.getBounds(); });
+        app.stage.eventMode = 'static';
+        app.stage.hitArea = app.screen;
+        app.stage.on('pointermove', (e) => {
+            if (this.isDragging) {
+                this.handleMove(e);
+            }
+        });
+        app.stage.on('pointerup', () => this.handleUp());
+        app.stage.on('pointerupoutside', () => this.handleUp());
+        // window.addEventListener('pointerup', () => this.handleUp());
+        // window.addEventListener('pointermove', (e) => this.handleMove(e));
     }
 
     public onResize(width: number, height: number) {
-        const margin = width < 500 ? 60 : 100;
+        const margin = width < 500 ? 75 : 100;
         this.joystick.x = margin;
         this.joystick.y = height - margin;
-        this.attackBtn.position.set(width - 100, height - 100);
+        this.attackBtn.position.set(this.joystick.x + margin * 2, height - margin);
     }
 
-    private handleMove(e: PointerEvent) {
+    private handleMove(e: FederatedPointerEvent) {
         if (!this.isDragging) return;
 
-        const dx = e.clientX - this.joystick.x;
-        const dy = e.clientY - this.joystick.y;
+        const dx = e.global.x - this.joystick.x;
+        const dy = e.global.y - this.joystick.y;
         const dist = Math.sqrt(dx ** 2 + dy ** 2);
         const maxDist = 60;
 
