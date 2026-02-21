@@ -36,7 +36,7 @@ export class TouchControls extends Container {
             color: 0xff4444,
             alpha: 0.5
         }).circle(0, 0, 40).fill().stroke();
-        this.attackBtn.position.set(app.screen.width - 100, screenHeight - 100);
+        this.attackBtn.position.set(app.screen.width - 100, screenHeight + 100);
         this.attackBtn.eventMode = 'static';
         this.attackBtn.on('pointerdown', () => {
             this.isAttacking = true;
@@ -71,7 +71,7 @@ export class TouchControls extends Container {
         const margin = width < 500 ? 75 : 100;
         this.joystick.x = margin;
         this.joystick.y = height - margin;
-        this.attackBtn.position.set(this.joystick.x + margin * 2, height - margin);
+        this.attackBtn.position.set(this.joystick.x + margin * 2, height + margin * 2);
     }
 
     private handleMove(e: FederatedPointerEvent) {
