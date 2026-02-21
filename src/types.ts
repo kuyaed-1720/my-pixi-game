@@ -27,6 +27,7 @@ export type EntityType = 'player' | 'enemy';
  * Core attributes for any living entity in the game.
  */
 export interface IEntityStats {
+    id: number;
     /** Current health points; entity dies if reaches 0. */
     hp: number;
     /** Maximum health capacity. */

@@ -5,7 +5,7 @@ import { Player } from "./Player";
 import { Enemy } from "./Enemy";
 import { Collision } from "./Collision";
 
-const enemies: Entity[] = [];
+const enemies: Enemy[] = [];
 
 async function init() {
     // Get the game container
@@ -17,6 +17,7 @@ async function init() {
 
     // For live information while in debug mode
     const debugHud = document.getElementById('debug-hud');
+    const enemyHud = document.getElementById('enemy-hud');
 
     // Initialize app
     const app = new Application();
@@ -44,21 +45,21 @@ async function init() {
     const heroStats = {
         hp: 200,
         maxHp: 200,
-        atk: 25,
+        atk: 50,
         speed: 30,
         acceleration: 2.5,
         deceleration: 4,
-        damageCooldown: 60
+        damageCooldown: 6
     };
 
     const slimeStats = {
-        hp: 300,
-        maxHp: 300,
+        hp: 500,
+        maxHp: 500,
         atk: 20,
         speed: 25,
         acceleration: 0,
         deceleration: 0,
-        damageCooldown: 40
+        damageCooldown: 4
     };
 
     const hero = new Player(playerSheet.animations, heroStats);
@@ -76,41 +77,55 @@ async function init() {
         slime.x = 200 + (1 * 100);
         slime.y = 200 + (i * 100);
 
+        const p = document.createElement('p');
+        p.id = `enemy${i}`;
+        slime.stats.id = i;
+        p.innerHTML = ``;
+        if (enemyHud) enemyHud.appendChild(p);
+
         enemies.push(slime);
         world.addChild(slime);
     }
 
     // Update the game
     app.ticker.add((time) => {
-        if (app.screen.width === 0 || !hero) return;
+        if (app.screen.width === 0) return;
+        const dt = Math.min(time.deltaTime, 0.1);
 
-        hero.update(time.deltaTime);
+        hero.update(dt);
 
         hero.performAttack(enemies);
 
         while (Entity.deadQueue.length > 0) {
             const corpse = Entity.deadQueue.pop();
-            const index = enemies.indexOf(corpse!);
-            if (index > -1) {
-                enemies.splice(index, 1);
+            if (corpse?.entityType === 'enemy') {
+                const enemyCorpse = corpse as Enemy;
+                const index = enemies.indexOf(enemyCorpse!);
+                if (index > -1) {
+                    enemies.splice(index, 1);
+                }
             }
         }
 
         enemies.forEach(enemy => {
             if (enemy.stats.hp <= 0) return;
-            enemy.update(time.deltaTime);
+            enemy.update(dt);
 
+            if (hero && !hero.isDestroyed) {
             if (Collision.checkCircle(hero.getCollisionCircle(), enemy.getCollisionCircle())) {
-                hero.takeDamage(enemy.stats['atk'], enemy);
+                hero.takeDamage(enemy.stats.atk, enemy);
+            }
             }
         });
 
-        const targetX = (app.screen.width / 2) - hero.x;
-        const targetY = (app.screen.height / 2) - hero.y;
+        if (hero && !hero.isDestroyed) {
+            const targetX = (app.screen.width / 2) - hero.x;
+            const targetY = (app.screen.height / 2) - hero.y;
 
-        if (!isNaN(targetX) && !isNaN(targetY)) {
-            world.x = targetX;
-            world.y = targetY;
+            if (!isNaN(targetX) && !isNaN(targetY)) {
+                world.x = targetX;
+                world.y = targetY;
+            }
         }
 
         // Update debug hud contents
@@ -118,6 +133,15 @@ async function init() {
             debugHud.innerHTML = `
             ${hero.getPlayerSummary()}
             `;
+            enemies.forEach(enemy => {
+                const distanceX = hero.x - enemy.x;
+                const distanceY = hero.y - enemy.y;
+                const distance = Math.sqrt(distanceX ** 2 + distanceY ** 2);
+
+                if (enemyHud && enemy.getStats() >= distance) {
+                    enemyHud.innerHTML = `${enemy.getEnemySummary()}`;
+                }
+            });
         }
     });
 }

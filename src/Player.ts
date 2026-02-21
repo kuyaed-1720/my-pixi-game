@@ -27,10 +27,8 @@ export class Player extends Entity {
      * Updates player physics and animations every frame.
      * @param deltaTime - Time elapsed since last frame.
      */
-    public update(deltaTime: number): void {
-        super.update(deltaTime);
-        const dt = Math.min(deltaTime, 0.1);
-
+    public update(dt: number): void {
+        super.update(dt);
         this.applyMovementPhysics(dt);
     }
 

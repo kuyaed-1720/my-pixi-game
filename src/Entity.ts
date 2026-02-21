@@ -32,6 +32,7 @@ export class Entity extends Container {
         this.entityType = type;
         this.animations = animations;
         const defaultStats = {
+            id: 0,
             hp: 100,
             maxHp: 100,
             atk: 10,
@@ -64,7 +65,6 @@ export class Entity extends Container {
      * @param dt - The delta time from the game ticker.
      */
     public update(dt: number): void {
-        if (this.isDestroyed) return;
         this.zIndex = this.y;
         if (this.damageCooldown > 0) {
             this.damageCooldown -= dt;
@@ -78,6 +78,14 @@ export class Entity extends Container {
         // if (this.debugGraphic.visible && !this.isDestroyed) {
         //     this.drawCollisionCircle();
         // }
+    }
+
+    public getId() {
+        return this.entityType;
+    }
+
+    public getCooldown() {
+        return this.damageCooldown;
     }
 
     /**
@@ -141,7 +149,7 @@ export class Entity extends Container {
     public takeDamage(amount: number, source?: Entity): void {
         if (this.damageCooldown > 0 || this.isDestroyed) return;
 
-        this.stats['hp'] -= amount;
+        this.stats.hp -= amount;
         this.damageCooldown = this.stats.damageCooldown;
         this.sprite.tint = 0xff0000;
 
@@ -151,7 +159,8 @@ export class Entity extends Container {
             const dist = Math.sqrt(dx ** 2 + dy ** 2) || 1;
 
             // Scale knockback power base on attack
-            const powerScaling = (source.stats['atk'] * 10);
+            const weightResistance = 1 - this.stats.weight;
+            const powerScaling = (source.stats.atk * weightResistance);
 
             this.externalForce.x = (dx / dist) * powerScaling;
             this.externalForce.y = (dy / dist) * powerScaling;

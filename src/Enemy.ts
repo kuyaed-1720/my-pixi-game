@@ -13,11 +13,9 @@ export class Enemy extends Entity {
         this.target = target;
     }
 
-    public update(deltaTime: number) {
-        super.update(deltaTime)
-        if (this.isDestroyed) return;
-        const dt = Math.min(deltaTime, 0.1);
-        if (!this.target || this.target.isDestroyed) return;
+    public update(dt: number) {
+        if (!this.target || this.target.isDestroyed || this.isDestroyed) return;
+        super.update(dt)
 
         // Calculate distance to player
         const distanceX = this.target.x - this.x;
@@ -28,8 +26,8 @@ export class Enemy extends Entity {
 
         // Only chase player if inside range
         if (distance < this.chaseRange && distance > 32) {
-            target.x = (distanceX / distance) * this.stats['speed'];
-            target.y = (distanceY / distance) * this.stats['speed'];
+            target.x = (distanceX / distance) * this.stats.speed;
+            target.y = (distanceY / distance) * this.stats.speed;
             this.playAnimation('walk');
             this.sprite.scale.x = distanceX > 0 ? 4 : -4;
         } else {
@@ -37,9 +35,8 @@ export class Enemy extends Entity {
         }
 
         // Velocity Interpolation
-        const weight = 0.1;
-        this.velocity.x += (target.x - this.velocity.x) * weight * dt;
-        this.velocity.y += (target.y - this.velocity.y) * weight * dt;
+        this.velocity.x += (target.x - this.velocity.x) * this.stats.weight * dt;
+        this.velocity.y += (target.y - this.velocity.y) * this.stats.weight * dt;
 
         // Snap to zero
         if (Math.abs(this.velocity.x) < 0.01) this.velocity.x = 0;
@@ -56,5 +53,23 @@ export class Enemy extends Entity {
         // Final position update
         this.x += (this.velocity.x + this.externalForce.x) * dt;
         this.y += (this.velocity.y + this.externalForce.y) * dt;
+    }
+
+    public getStats() {
+        return this.chaseRange;
+    }
+
+    public getEnemySummary() {
+        return `
+            target: ${this.target}<br>
+            chase-range: ${this.chaseRange}<br>
+            velocity: (${this.velocity.x.toFixed(2)}, ${this.velocity.y.toFixed(2)})<br>
+            location: (${this.x.toFixed(2)}, ${this.y.toFixed(2)})<br>
+            weight: ${this.stats.weight}<br>
+            hp: ${this.stats.hp} / ${this.stats.maxHp}<br>
+            atk: ${this.stats.atk}<br>
+            speed: ${this.stats.speed} (a: ${this.stats.acceleration} | d: ${this.stats.deceleration})<br>
+            damage-cd: ${this.getCooldown().toFixed(2)} / ${this.stats.damageCooldown}
+        `;
     }
 }
